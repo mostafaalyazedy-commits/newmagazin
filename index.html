@@ -1,6 +1,7 @@
 <!DOCTYPE html><html lang="ar" dir="rtl"><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preload" as="image" href="./ocean-pharmacy-logo-optimized.png">
 <title>مجلة عروض أوشن</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
@@ -4602,6 +4603,254 @@ body.pdf-exporting .mode-pill { display: none !important; }
   .filter-sheet, .sheet-backdrop { transition: none; }
 }
 
+
+/* ════════════════════════════════════════════════════════════════
+   DESIGN TOKENS (shopping layer) + OFFICIAL OCEAN PHARMACY LOGO
+   One image (./ocean-pharmacy-logo-optimized.png), one component,
+   size variants — never redrawn, recolored, cropped or distorted.
+   On dark surfaces the logo sits in its faithful white container.
+   ════════════════════════════════════════════════════════════════ */
+:root {
+  --color-primary: #0E3D6E;
+  --color-primary-dark: #0A2A4D;
+  --color-brand-green: #1F8438;
+  --color-brand-green-2: #2BA84A;
+  --color-offer: #E63946;
+  --color-gold: #FFD166;
+  --color-surface: #ffffff;
+  --color-background: #f4f6f9;
+  --color-text: #14202f;
+  --color-muted: #7a8694;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --shadow-card: 0 4px 16px rgba(16,35,61,.08);
+  --touch-target: 44px;
+  --header-z: 900;
+  --sheet-z: 1210;
+  --logo-ratio: 944 / 696;   /* real aspect ratio of the optimized logo */
+}
+
+.ocean-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  line-height: 1;
+  overflow: visible;
+}
+.ocean-logo__image {
+  display: block;
+  height: 100%;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+  object-position: center;
+  aspect-ratio: var(--logo-ratio);
+}
+.ocean-logo__fallback {
+  display: none;
+  font-family: 'Cairo', sans-serif;
+  font-weight: 800;
+  white-space: nowrap;
+  color: var(--color-primary);
+}
+.ocean-logo.logo-missing .ocean-logo__image { display: none; }
+.ocean-logo.logo-missing .ocean-logo__fallback { display: inline; }
+
+/* Faithful white container for dark surfaces (the original artwork bg) */
+.ocean-logo--chip {
+  background: #fff;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 3px 12px rgba(0,0,0,.16);
+}
+
+/* Variants */
+.ocean-logo--header { height: 44px; padding: 4px 12px; }
+.ocean-logo--header .ocean-logo__image { height: 36px; }
+.ocean-logo--header .ocean-logo__fallback { font-size: 15px; }
+
+.ocean-logo--toolbar { height: 42px; padding: 4px 12px; }
+.ocean-logo--toolbar .ocean-logo__image { height: 34px; }
+.ocean-logo--toolbar .ocean-logo__fallback { font-size: 15px; }
+
+.ocean-logo--page { height: 52px; }
+.ocean-logo--page .ocean-logo__image { height: 52px; }
+.ocean-logo--page .ocean-logo__fallback { font-size: 16px; color: var(--teal, #14524d); }
+
+.ocean-logo--cover { padding: 14px 24px; border-radius: 16px; }
+.ocean-logo--cover .ocean-logo__image { height: 118px; }
+.ocean-logo--cover .ocean-logo__fallback { font-size: 30px; }
+
+.ocean-logo--final { padding: 10px 18px; border-radius: 14px; }
+.ocean-logo--final .ocean-logo__image { height: 84px; }
+.ocean-logo--final .ocean-logo__fallback { font-size: 22px; }
+
+@media (max-width: 700px) {
+  .ocean-logo--cover { padding: 10px 16px; }
+  .ocean-logo--cover .ocean-logo__image { height: 74px; }
+  .ocean-logo--page { height: 40px; }
+  .ocean-logo--page .ocean-logo__image { height: 40px; }
+}
+
+
+/* ════════════════════════════════════════════════════════════════
+   SHOPPING v2 — adaptive header, discovery, cart sheet, quick view,
+   load-more, back-to-top
+   ════════════════════════════════════════════════════════════════ */
+/* Adaptive compact header: brand row folds away while scrolling down */
+.sh-row-brand {
+  max-height: 70px;
+  transition: max-height .28s ease, opacity .2s ease, padding .28s ease;
+  overflow: hidden;
+}
+body.sh-compact .sh-row-brand {
+  max-height: 0;
+  opacity: 0;
+  padding-bottom: 0;
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) { .sh-row-brand { transition: none; } }
+
+.sh-btn svg, .sh-filter-btn svg, .sh-search-icn svg { display: block; }
+.sh-more-menu button svg { flex: 0 0 auto; color: var(--color-primary); }
+.mode-pill { display: inline-flex; align-items: center; gap: 8px; }
+.mode-pill svg { display: block; }
+.sr-shown { font-weight: 600; color: var(--color-muted); font-size: 12.5px; }
+
+/* Load more */
+#shop-load-more { display: flex; justify-content: center; padding: 18px 0 6px; }
+#shop-load-more[hidden] { display: none; }
+.sh-load-more-btn {
+  min-height: 48px; padding: 0 26px; border-radius: var(--radius-md);
+  border: 1.5px solid #cfd8e3; background: var(--color-surface); color: var(--color-primary);
+  font-family: 'Cairo', sans-serif; font-weight: 800; font-size: 15px; cursor: pointer;
+  box-shadow: var(--shadow-card);
+}
+.sh-load-more-btn:active { transform: scale(.97); }
+#shop-load-sentinel { width: 1px; height: 1px; }
+
+/* Discovery sections */
+#shop-discover[hidden] { display: none; }
+.dv-section { margin-bottom: 16px; }
+.dv-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.dv-head h2 { font-family: 'Cairo', sans-serif; font-size: 17px; font-weight: 900; color: var(--color-text); }
+.dv-all {
+  border: 0; background: none; color: var(--color-primary); cursor: pointer;
+  font-family: 'Cairo', sans-serif; font-weight: 800; font-size: 13.5px;
+  min-height: 40px; padding: 0 8px; text-decoration: underline; text-underline-offset: 3px;
+}
+.dv-scroll {
+  display: flex; gap: 10px; overflow-x: auto; -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; padding: 2px 2px 6px; margin: -2px;
+}
+.dv-scroll::-webkit-scrollbar { display: none; }
+.dv-card {
+  flex: 0 0 132px; width: 132px; border: 1px solid #edf0f4; border-radius: var(--radius-md);
+  background: var(--color-surface); padding: 8px; cursor: pointer; text-align: center;
+  box-shadow: var(--shadow-card); display: flex; flex-direction: column; gap: 6px;
+  font-family: 'Cairo', sans-serif;
+}
+.dv-card:active { transform: scale(.97); }
+.dv-img {
+  position: relative; display: flex; align-items: center; justify-content: center;
+  aspect-ratio: 1/1; background: #F7F3E8; border-radius: 10px; overflow: hidden;
+}
+.dv-img img { max-width: 88%; max-height: 88%; object-fit: contain; }
+.dv-badge {
+  position: absolute; top: 5px; inset-inline-start: 5px; z-index: 3;
+  background: var(--color-offer); color: #fff; border-radius: 8px;
+  font-size: 11px; font-weight: 900; padding: 3px 7px 4px;
+  line-height: 1.15; white-space: nowrap; direction: rtl;
+  font-family: 'Cairo', sans-serif;
+}
+.dv-badge.combo-badge { font-size: 9px; max-width: calc(100% - 10px); white-space: normal; text-align:center; }
+.dv-img > img { width:auto !important; height:auto !important; max-width:90% !important; max-height:90% !important; object-fit:contain !important; }
+.dv-name {
+  font-size: 12px; font-weight: 700; color: var(--color-text); line-height: 1.3;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  min-height: 31px;
+}
+.dv-price { font-size: 13.5px; font-weight: 900; color: var(--color-offer); font-variant-numeric: tabular-nums; }
+.dv-price span { font-size: 10.5px; font-weight: 800; }
+
+/* Cart sheet */
+.cart-summary {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  font-family: 'Cairo', sans-serif; font-weight: 800; font-size: 14px; color: var(--color-text);
+  background: #f4f7fa; border-radius: var(--radius-sm); padding: 10px 14px; margin-bottom: 12px;
+}
+.cart-summary .cs-save { color: var(--color-brand-green); font-size: 13px; }
+.cart-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 12px 2px; border-bottom: 1px solid #eef1f5;
+}
+.cr-info { flex: 1 1 auto; min-width: 0; font-family: 'Cairo', sans-serif; }
+.cr-name { font-weight: 800; font-size: 14px; color: var(--color-text); line-height: 1.35;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.cr-code { font-family: 'Roboto Mono', monospace; font-size: 11px; color: var(--color-muted); margin-top: 2px; }
+.cr-price { font-size: 13px; font-weight: 800; color: var(--color-offer); margin-top: 3px; font-variant-numeric: tabular-nums; }
+.cr-price s { color: var(--color-muted); font-weight: 600; margin-inline-start: 6px; }
+.cr-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex: 0 0 auto; }
+.cr-actions .product-qty-control { margin: 0; }
+.cr-line { font-family: 'Cairo', sans-serif; font-weight: 900; font-size: 13.5px; color: var(--color-text); font-variant-numeric: tabular-nums; }
+.cr-del {
+  border: 0; background: none; color: var(--color-offer); cursor: pointer;
+  font-family: 'Cairo', sans-serif; font-weight: 700; font-size: 12.5px;
+  min-height: 32px; padding: 0 6px; text-decoration: underline; text-underline-offset: 2px;
+}
+.cart-empty { text-align: center; padding: 36px 10px; font-family: 'Cairo', sans-serif; }
+.cart-empty p { font-size: 18px; font-weight: 900; color: var(--color-text); margin-bottom: 6px; }
+.cart-empty span { font-size: 13.5px; color: var(--color-muted); }
+.cart-foot .fs-apply { font-variant-numeric: tabular-nums; }
+
+/* Quick view */
+.qv-sheet .fs-body { padding-bottom: calc(22px + env(safe-area-inset-bottom, 0)); }
+.qv-img {
+  display: flex; align-items: center; justify-content: center;
+  background: #F7F3E8; border-radius: var(--radius-md);
+  height: min(46vw, 260px); margin-bottom: 14px; overflow: hidden;
+}
+.qv-img img { max-width: 86%; max-height: 86%; object-fit: contain; }
+.qv-name { font-family: 'Cairo', sans-serif; font-size: 19px; font-weight: 900; color: var(--color-text); line-height: 1.35; }
+.qv-en { font-family: 'IBM Plex Sans Arabic', sans-serif; font-size: 12.5px; color: var(--color-muted); margin-top: 3px; direction: ltr; text-align: end; }
+.qv-sub { font-family: 'Cairo', sans-serif; font-size: 13.5px; color: #5a6470; margin-top: 6px; }
+.qv-price-row { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+.qv-price { font-family: 'Cairo', sans-serif; font-size: 26px; font-weight: 900; color: var(--color-offer); font-variant-numeric: tabular-nums; }
+.qv-price span { font-size: 14px; }
+.qv-old { font-family: 'Cairo', sans-serif; font-size: 14px; color: var(--color-muted); text-decoration: line-through; font-variant-numeric: tabular-nums; }
+.qv-offer { background: var(--color-offer); color: #fff; border-radius: 8px; padding: 3px 10px 4px; font-family: 'Cairo', sans-serif; font-size: 12px; font-weight: 800; }
+.qv-save { margin-top: 8px; font-family: 'Cairo', sans-serif; font-size: 13px; font-weight: 800; color: var(--color-brand-green); }
+.qv-code { margin-top: 8px; font-family: 'Roboto Mono', monospace; font-size: 12px; color: var(--color-muted); }
+.qv-cart { margin-top: 16px; }
+.qv-cart[data-incart="0"] .product-qty-control { display: none; }
+.qv-cart[data-incart="1"] .sc-add { display: none; }
+.qv-cart .product-qty-control { margin: 0; width: 100%; }
+
+/* Back to top */
+#back-to-top {
+  position: fixed; bottom: 18px; inset-inline-end: 16px; z-index: 1100;
+  width: 48px; height: 48px; border: 0; border-radius: 50%;
+  background: var(--color-primary); color: #fff; cursor: pointer;
+  box-shadow: 0 10px 24px rgba(10,42,77,.35);
+  display: flex; align-items: center; justify-content: center;
+}
+#back-to-top[hidden] { display: none; }
+body.cart-bar-open #back-to-top { bottom: 86px; }
+body:not(.shop-mode) #back-to-top { display: none; }
+
+/* Shopping chrome (v2) never leaks into PDF/print */
+@media print {
+  #shop-discover, #shop-load-more, #back-to-top, #cart-sheet, #cart-backdrop, #qv-sheet, #qv-backdrop { display: none !important; }
+}
+body.pdf-exporting #shop-discover,
+body.pdf-exporting #shop-load-more,
+body.pdf-exporting #back-to-top,
+body.pdf-exporting #cart-sheet,
+body.pdf-exporting #cart-backdrop,
+body.pdf-exporting #qv-sheet,
+body.pdf-exporting #qv-backdrop { display: none !important; }
+
 </style>
 </head>
 <body>
@@ -4613,27 +4862,27 @@ body.pdf-exporting .mode-pill { display: none !important; }
 <div id="shop-view" hidden>
   <header class="shop-header" id="shop-header">
     <div class="sh-row sh-row-brand">
-      <div class="sh-brand"><span class="ring">O</span><span>صيدلية أوشن</span></div>
+      <div class="sh-brand"><span class="ocean-logo ocean-logo--header ocean-logo--chip"><img class="ocean-logo__image" src="./ocean-pharmacy-logo-optimized.png" alt="صيدلية أوشن - Ocean Pharmacy" decoding="async" onerror="this.closest(&quot;.ocean-logo&quot;).classList.add(&quot;logo-missing&quot;)"><span class="ocean-logo__fallback">صيدلية أوشن</span></span></div>
       <div class="sh-actions">
-        <button type="button" class="sh-btn sh-mode-btn" id="shop-to-magazine" aria-label="تصفح المجلة بالشكل التقليدي">📖 <span>المجلة</span></button>
-        <button type="button" class="sh-btn sh-cart-btn" id="shop-cart-btn" aria-label="السلة">🛒<span class="sh-cart-count" id="shop-cart-count" hidden>0</span></button>
+        <button type="button" class="sh-btn sh-mode-btn" id="shop-to-magazine" aria-label="تصفح المجلة بالشكل التقليدي"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h5v18H6a2 2 0 0 1-2-2z"/><path d="M20 5a2 2 0 0 0-2-2h-5v18h5a2 2 0 0 0 2-2z"/></svg><span>المجلة</span></button>
+        <button type="button" class="sh-btn sh-cart-btn" id="shop-cart-btn" aria-label="السلة"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="20" r="1.6"/><circle cx="17" cy="20" r="1.6"/><path d="M3 4h2l2.4 11.2a1.6 1.6 0 0 0 1.6 1.3h7.6a1.6 1.6 0 0 0 1.6-1.3L20 8H6"/></svg><span class="sh-cart-count" id="shop-cart-count" hidden>0</span></button>
         <div class="sh-more-wrap">
-          <button type="button" class="sh-btn" id="shop-more-btn" aria-haspopup="true" aria-expanded="false" aria-label="المزيد من الخيارات">⋮</button>
+          <button type="button" class="sh-btn" id="shop-more-btn" aria-haspopup="true" aria-expanded="false" aria-label="المزيد من الخيارات"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="1.9"/><circle cx="12" cy="12" r="1.9"/><circle cx="12" cy="19" r="1.9"/></svg></button>
           <div class="sh-more-menu" id="shop-more-menu" hidden>
-            <button type="button" id="shop-menu-pdf">⬇️ تحميل PDF</button>
-            <button type="button" id="shop-menu-refresh">🔄 تحديث البيانات</button>
+            <button type="button" id="shop-menu-pdf"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v11"/><path d="m7.5 10.5 4.5 4 4.5-4"/><path d="M5 20h14"/></svg><span>تحميل PDF</span></button>
+            <button type="button" id="shop-menu-refresh"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 3v5h-5"/></svg><span>تحديث البيانات</span></button>
           </div>
         </div>
       </div>
     </div>
     <div class="sh-row sh-row-search">
       <div class="sh-search-wrap">
-        <span class="sh-search-icn" aria-hidden="true">🔍</span>
+        <span class="sh-search-icn" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="20" y1="20" x2="16.5" y2="16.5"/></svg></span>
         <input type="search" id="shop-search" class="sh-search" placeholder="ابحث عن منتج، براند، قسم أو كود الصنف" autocomplete="off" enterkeyhint="search" aria-label="بحث في العروض">
-        <button type="button" class="sh-search-clear" id="shop-search-clear" aria-label="مسح البحث" hidden>✕</button>
+        <button type="button" class="sh-search-clear" id="shop-search-clear" aria-label="مسح البحث" hidden><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
       </div>
       <button type="button" class="sh-filter-btn" id="shop-filter-btn" aria-label="تصفية المنتجات">
-        <span aria-hidden="true">⚙</span><span class="sh-filter-lbl">فلترة</span><span class="sh-filter-count" id="shop-filter-count" hidden></span>
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/><circle cx="9" cy="7" r="2" fill="currentColor" stroke="none"/><circle cx="15" cy="12" r="2" fill="currentColor" stroke="none"/><circle cx="7" cy="17" r="2" fill="currentColor" stroke="none"/></svg><span class="sh-filter-lbl">فلترة</span><span class="sh-filter-count" id="shop-filter-count" hidden></span>
       </button>
     </div>
     <div class="sh-suggest" id="shop-suggest" hidden role="listbox" aria-label="اقتراحات البحث"></div>
@@ -4666,7 +4915,7 @@ body.pdf-exporting .mode-pill { display: none !important; }
   <div class="fs-handle" aria-hidden="true"></div>
   <div class="fs-head">
     <h2>تصفية المنتجات</h2>
-    <button type="button" class="fs-close" id="filter-close" aria-label="إغلاق">✕</button>
+    <button type="button" class="fs-close" id="filter-close" aria-label="إغلاق"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
   </div>
   <div class="fs-body" id="filter-body"></div>
   <div class="fs-foot">
@@ -4676,10 +4925,10 @@ body.pdf-exporting .mode-pill { display: none !important; }
 </div>
 
 <!-- Floating pill to return to shopping from magazine mode -->
-<button type="button" id="magazine-to-shop" class="mode-pill" hidden aria-label="العودة لوضع التسوق">🛍️ تسوق العروض</button>
+<button type="button" id="magazine-to-shop" class="mode-pill" hidden aria-label="العودة لوضع التسوق"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="20" r="1.6"/><circle cx="17" cy="20" r="1.6"/><path d="M3 4h2l2.4 11.2a1.6 1.6 0 0 0 1.6 1.3h7.6a1.6 1.6 0 0 0 1.6-1.3L20 8H6"/></svg><span>تسوق العروض</span></button>
 
 <div class="toolbar" id="toolbar">
-  <div class="brand"><span class="ring">O</span><span>صيدلية أوشن</span></div>
+  <div class="brand"><span class="ocean-logo ocean-logo--toolbar ocean-logo--chip"><img class="ocean-logo__image" src="./ocean-pharmacy-logo-optimized.png" alt="صيدلية أوشن - Ocean Pharmacy" decoding="async" onerror="this.closest(&quot;.ocean-logo&quot;).classList.add(&quot;logo-missing&quot;)"><span class="ocean-logo__fallback">صيدلية أوشن</span></span></div>
   <div class="divider"></div>
   <input type="text" id="search-input" class="search" placeholder="بحث عن منتج…" autocomplete="off">
   <select id="category-filter" class="filter" aria-label="تصفية حسب القسم">
@@ -4716,7 +4965,7 @@ body.pdf-exporting .mode-pill { display: none !important; }
     <div class="cover">
       <div class="cover-arc"></div><div class="cover-arc-2"></div><div class="cover-dots"></div>
       <div class="cover-top">
-        <div class="cover-mast"><span class="ring">O</span><span>أوشن</span></div>
+        <div class="cover-mast"><span class="ocean-logo ocean-logo--cover ocean-logo--chip"><img class="ocean-logo__image" src="./ocean-pharmacy-logo-optimized.png" alt="صيدلية أوشن - Ocean Pharmacy" decoding="async" onerror="this.closest(&quot;.ocean-logo&quot;).classList.add(&quot;logo-missing&quot;)"><span class="ocean-logo__fallback">صيدلية أوشن</span></span></div>
         <div class="cover-edition"><strong>JUNE · 2026</strong>ISSUE 06 — VOL. 02</div>
       </div>
       <div class="cover-tagline"><span>صحّة · جمال · عناية</span></div>
@@ -4771,7 +5020,7 @@ body.pdf-exporting .mode-pill { display: none !important; }
           <div class="section-strip" style="margin-top:16px; width: 280px;"></div>
         </div>
         <div class="h-right">
-          <div class="wordmark"><span class="wordmark-mark">O</span><span>صيدلية أوشن</span></div>
+          <div class="wordmark"><span class="ocean-logo ocean-logo--page"><img class="ocean-logo__image" src="./ocean-pharmacy-logo-optimized.png" alt="صيدلية أوشن - Ocean Pharmacy" decoding="async" onerror="this.closest(&quot;.ocean-logo&quot;).classList.add(&quot;logo-missing&quot;)"><span class="ocean-logo__fallback">صيدلية أوشن</span></span></div>
           <div class="ed">JUNE 2026 · ISSUE 06</div>
         </div>
       </div>
@@ -5185,7 +5434,7 @@ function renderCategoryPageHtml(cat, products, pageIdx, isFirstOfCat, hasHero, g
               <div class="section-strip" style="margin-top:16px; width:280px; ${stripStyle}"></div>
             </div>
             <div class="h-right">
-              <div class="wordmark"><span class="wordmark-mark">O</span><span>صيدلية أوشن</span></div>
+              <div class="wordmark"><span class="ocean-logo ocean-logo--page"><img class="ocean-logo__image" src="./ocean-pharmacy-logo-optimized.png" alt="صيدلية أوشن - Ocean Pharmacy" decoding="async" onerror="this.closest(&quot;.ocean-logo&quot;).classList.add(&quot;logo-missing&quot;)"><span class="ocean-logo__fallback">صيدلية أوشن</span></span></div>
               <div class="ed">${isFirstOfCat?"":"+"}${escapeHtml(String(products.length))} عرضاً</div>
             </div>
           </div>
@@ -5516,7 +5765,7 @@ function renderFinalPage(s) {
   };
   return `<div class="page-wrap"><section class="page"><div class="final-page">
     <div class="final-head">
-      <div class="brand-row"><span class="ring">O</span><span>${escapeHtml(getSetting('brand_name_ar'))}</span></div>
+      <div class="brand-row"><span class="ocean-logo ocean-logo--final ocean-logo--chip"><img class="ocean-logo__image" src="./ocean-pharmacy-logo-optimized.png" alt="صيدلية أوشن - Ocean Pharmacy" decoding="async" onerror="this.closest(&quot;.ocean-logo&quot;).classList.add(&quot;logo-missing&quot;)"><span class="ocean-logo__fallback">صيدلية أوشن</span></span></div>
       <div class="meta">CONTACT · ${escapeHtml(s.contact_title_ar||"تواصل معنا")}</div>
     </div>
     <div class="final-title-block">
@@ -6354,10 +6603,15 @@ function renderCoverAndStaticSections() {
   if (magTitle) document.title = magTitle;
 
   /* ── Cover page ── */
+  /* Official Ocean Pharmacy logo is the one and only brand mark — sheet
+     settings only refresh the accessible fallback text, never replace it. */
   const coverMast = document.querySelector('.cover-mast');
   if (coverMast) {
-    const r = getSetting('brand_ring_letter'), s = getSetting('brand_short_ar');
-    if (r || s) coverMast.innerHTML = `<span class="ring">${escapeHtml(r)}</span><span>${escapeHtml(s)}</span>`;
+    const s = getSetting('brand_short_ar') || getSetting('brand_name_ar');
+    const fb = coverMast.querySelector('.ocean-logo__fallback');
+    if (s && fb) fb.textContent = s;
+    const lg = coverMast.querySelector('.ocean-logo');
+    if (s && lg) lg.setAttribute('aria-label', s);
   }
   const coverEdition = document.querySelector('.cover-edition');
   if (coverEdition) {
@@ -8109,10 +8363,16 @@ function buildSearchIndex() {
     };
     var hayTokens = (nameAr + " " + nameEn + " " + fields.sub + " " + fields.cat + " " + fields.badge)
       .split(" ").filter(Boolean);
-    return { p: p, order: i, f: fields, tokens: hayTokens,
-             disc: productDiscountPct(p), price: getProductPrice(p), offer: offerTypeOf(p) };
+    var priceNow = getProductPrice(p);
+    var oldPrice = parseFloat(String(p.old_price || "").replace(/[^0-9.]/g, ""));
+    var save = (isFinite(oldPrice) && oldPrice > priceNow && priceNow > 0) ? (oldPrice - priceNow) : 0;
+    return { p: p, order: i, f: fields, tokens: hayTokens, id: getProductCartId(p),
+             disc: productDiscountPct(p), price: priceNow, save: save, offer: offerTypeOf(p) };
   });
+  SHOP_ID_MAP = new Map();
+  SEARCH_INDEX.forEach(function (e) { if (!SHOP_ID_MAP.has(e.id)) SHOP_ID_MAP.set(e.id, e); });
 }
+var SHOP_ID_MAP = new Map();
 window.buildShopSearchIndex = buildSearchIndex;
 
 /* Score one indexed product against expanded query tokens. 0 = no match. */
@@ -8177,8 +8437,9 @@ function searchProducts(query) {
 /* ─────────────────────────── STATE ───────────────────────────── */
 var SHOP = {
   q: "", cat: "", hot: false, discMin: 0, price: "", offer: "",
-  sort: "magazine", view: "grid"
+  sort: "magazine", view: "grid", page: 1
 };
+var PAGE_SIZE = 40;   /* products rendered per batch (performance with 200+ items) */
 var LS = {
   get: function (k, d) { try { var v = localStorage.getItem(k); return v == null ? d : v; } catch (e) { return d; } },
   set: function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
@@ -8241,6 +8502,7 @@ function applySort(list) {
   switch (mode) {
     case "relevance": /* already score-sorted by searchProducts */ break;
     case "discount": arr.sort(function (a, b) { return b.e.disc - a.e.disc || a.e.order - b.e.order; }); break;
+    case "saving": arr.sort(function (a, b) { return b.e.save - a.e.save || a.e.order - b.e.order; }); break;
     case "priceAsc": arr.sort(function (a, b) { return (a.e.price || 1e9) - (b.e.price || 1e9); }); break;
     case "priceDesc": arr.sort(function (a, b) { return b.e.price - a.e.price; }); break;
     case "name": arr.sort(function (a, b) { return String(a.e.p.product_name_ar || "").localeCompare(String(b.e.p.product_name_ar || ""), "ar"); }); break;
@@ -8294,7 +8556,7 @@ function shopCardHtml(e) {
       '</div>' +
       (save > 0 ? '<span class="sc-save">وفرت ' + fmtPrice(save) + ' ر.س</span>' : '') +
       '<div class="sc-cart">' +
-        '<button type="button" class="sc-add" data-cart-add="' + escapeHtml(id) + '" data-product=\'' + prodJson + '\'>🛒 أضف للسلة</button>' +
+        '<button type="button" class="sc-add" data-cart-add="' + escapeHtml(id) + '" data-product=\'' + prodJson + '\'>أضف للسلة</button>' +
         '<div class="product-qty-control" data-qty="' + qty + '" data-cart-id="' + escapeHtml(id) + '" role="group" aria-label="الكمية">' +
           '<button class="qty-btn qty-plus" type="button" data-cart-add="' + escapeHtml(id) + '" data-product=\'' + prodJson + '\' aria-label="زيادة الكمية">+</button>' +
           '<span class="qty-value" aria-live="polite">' + (qty || "أضف") + '</span>' +
@@ -8331,7 +8593,7 @@ function renderShopResults() {
       empty.hidden = false;
       var popular = SEARCH_INDEX.slice().sort(function (a, b) { return b.disc - a.disc; }).slice(0, 4);
       empty.innerHTML =
-        '<div class="se-icn">🔎</div><h3>لم نجد نتائج مطابقة</h3>' +
+        '<div class="se-icn" aria-hidden="true"><svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="20" y1="20" x2="16.5" y2="16.5"/></svg></div><h3>لم نجد نتائج مطابقة</h3>' +
         '<p>جرّب كلمة أبسط أو تهجئة مختلفة، أو تصفح أقوى العروض الحالية.</p>' +
         '<div class="se-actions">' +
           '<button type="button" class="primary" id="se-clear">مسح البحث والفلاتر</button>' +
@@ -8348,13 +8610,107 @@ function renderShopResults() {
   }
   if (empty) empty.hidden = true;
 
+  /* Batched rendering: first N, then "load more" (+ auto-load sentinel) */
+  var shown = Math.min(results.length, PAGE_SIZE * SHOP.page);
   var html = "";
-  for (var i = 0; i < results.length; i++) html += shopCardHtml(results[i].e);
+  for (var i = 0; i < shown; i++) html += shopCardHtml(results[i].e);
   grid.innerHTML = html;
+
+  if (countEl && shown < n) {
+    countEl.innerHTML += ' <span class="sr-shown">(يعرض ' + shown + ')</span>';
+  }
+  var moreWrap = document.getElementById("shop-load-more");
+  if (!moreWrap) {
+    moreWrap = document.createElement("div");
+    moreWrap.id = "shop-load-more";
+    grid.parentNode.insertBefore(moreWrap, grid.nextSibling);
+  }
+  if (shown < n) {
+    moreWrap.hidden = false;
+    moreWrap.innerHTML = '<button type="button" class="sh-load-more-btn" id="shop-load-more-btn">عرض المزيد (' + (n - shown) + ' منتجًا)</button><div id="shop-load-sentinel" aria-hidden="true"></div>';
+    var lmBtn = document.getElementById("shop-load-more-btn");
+    if (lmBtn) lmBtn.addEventListener("click", function () { loadMoreShopResults(); });
+    armLoadSentinel();
+  } else {
+    moreWrap.hidden = true;
+    moreWrap.innerHTML = "";
+  }
+
+  renderShopDiscovery();
   renderActiveFilterChips();
   updateShopFilterBadge();
 }
+function loadMoreShopResults() {
+  SHOP.page += 1;
+  if (_renderRAF) cancelAnimationFrame(_renderRAF);
+  _renderRAF = requestAnimationFrame(renderShopResults);
+  trackEvent("load_more", { page: SHOP.page });
+}
+var _sentinelIO = null;
+function armLoadSentinel() {
+  var s = document.getElementById("shop-load-sentinel");
+  if (!s || typeof IntersectionObserver === "undefined") return;
+  if (_sentinelIO) _sentinelIO.disconnect();
+  _sentinelIO = new IntersectionObserver(function (entries) {
+    if (entries.some(function (e) { return e.isIntersecting; })) {
+      _sentinelIO.disconnect();
+      loadMoreShopResults();
+    }
+  }, { rootMargin: "600px 0px" });
+  _sentinelIO.observe(s);
+}
+
+/* ── Discovery sections (pristine home only) ── */
+function isPristineHome() {
+  return !SHOP.q && !SHOP.cat && !SHOP.hot && !SHOP.discMin && !SHOP.price && !SHOP.offer;
+}
+function discoveryMiniCard(e) {
+  var rawBadge = String((e.p && (e.p.offer_badge || e.p.offer)) || '').trim();
+  var combo = /buy\s*1.*get\s*1|b1g1|1\s*[+x×]\s*1/i.test(rawBadge);
+  var combo2 = /buy\s*2.*get\s*1|b2g1|2\s*[+x×]\s*1/i.test(rawBadge);
+  var badgeHtml = combo
+    ? '<span class="dv-badge combo-badge">1+1 مجانًا</span>'
+    : (combo2
+      ? '<span class="dv-badge combo-badge">2+1 مجانًا</span>'
+      : (e.disc ? '<span class="dv-badge">' + e.disc + '%</span>' : ''));
+  return '<button type="button" class="dv-card" data-shop-id="' + escapeHtml(e.id) + '" aria-label="' + escapeHtml(e.p.product_name_ar || "") + '">' +
+    '<span class="dv-img">' + badgeHtml + shopImgHtml(e.p) + '</span>' +
+    '<span class="dv-name">' + escapeHtml(e.p.product_name_ar || e.p.product_name_en || "") + '</span>' +
+    '<span class="dv-price">' + fmtPrice(e.price) + ' <span>ر.س</span></span>' +
+  '</button>';
+}
+function renderShopDiscovery() {
+  var host = document.getElementById("shop-discover");
+  if (!host) {
+    host = document.createElement("section");
+    host.id = "shop-discover";
+    var bar = document.getElementById("shop-results-bar");
+    if (bar) bar.parentNode.insertBefore(host, bar);
+  }
+  if (!isPristineHome() || !SEARCH_INDEX.length) { host.hidden = true; host.innerHTML = ""; return; }
+
+  var byDisc = SEARCH_INDEX.filter(function (e) { return e.disc >= 20; })
+    .sort(function (a, b) { return b.disc - a.disc; }).slice(0, 8);
+  var bySave = SEARCH_INDEX.filter(function (e) { return e.save > 0; })
+    .sort(function (a, b) { return b.save - a.save; }).slice(0, 8);
+
+  var html = "";
+  if (byDisc.length >= 4) {
+    html += '<div class="dv-section"><div class="dv-head"><h2>أقوى الخصومات</h2>' +
+      '<button type="button" class="dv-all" data-dv="hot">عرض الكل</button></div>' +
+      '<div class="dv-scroll">' + byDisc.map(discoveryMiniCard).join("") + '</div></div>';
+  }
+  if (bySave.length >= 4) {
+    html += '<div class="dv-section"><div class="dv-head"><h2>الأكثر توفيرًا</h2>' +
+      '<button type="button" class="dv-all" data-dv="saving">عرض الكل</button></div>' +
+      '<div class="dv-scroll">' + bySave.map(discoveryMiniCard).join("") + '</div></div>';
+  }
+  if (!html) { host.hidden = true; host.innerHTML = ""; return; }
+  host.hidden = false;
+  host.innerHTML = html;
+}
 function shopRefresh() {
+  SHOP.page = 1;   /* any state change restarts pagination */
   saveShopState();
   if (_renderRAF) cancelAnimationFrame(_renderRAF);
   _renderRAF = requestAnimationFrame(renderShopResults);
@@ -8409,7 +8765,7 @@ function renderShopChips() {
   var wrap = document.getElementById("shop-chips");
   if (!wrap) return;
   var html = '<button type="button" class="sh-chip" data-chip="all">الكل</button>' +
-             '<button type="button" class="sh-chip chip-hot" data-chip="hot">🔥 أقوى الخصومات</button>';
+             '<button type="button" class="sh-chip chip-hot" data-chip="hot">أقوى الخصومات</button>';
   (window.ORDERED_CATS || []).forEach(function (cat) {
     html += '<button type="button" class="sh-chip" data-chip="cat" data-cat="' + escapeHtml(cat.key) + '">' + escapeHtml(cat.name_ar) + '</button>';
   });
@@ -8440,7 +8796,7 @@ function renderShopIntro() {
   el.innerHTML =
     '<div class="si-title">عروض صيدلية أوشن' + (maxDisc ? ' — خصومات حتى <em>' + maxDisc + '%</em>' : '') + '</div>' +
     '<div class="si-sub">ابحث، فلتر، وأضف للسلة — واطلب عبر واتساب من أقرب فرع.</div>' +
-    ((validity || edition) ? '<div class="si-meta">🗓️ ' + escapeHtml(validity || edition) + '</div>' : '');
+    ((validity || edition) ? '<div class="si-meta">' + escapeHtml(validity || edition) + '</div>' : '');
 }
 
 /* ─────────────────── SEARCH SUGGESTIONS DROPDOWN ─────────────── */
@@ -8473,7 +8829,7 @@ function renderSuggestions() {
     if (recent.length) {
       html += '<div class="sg-head">عمليات البحث الأخيرة <button type="button" data-sg="clear-recent">مسح</button></div>';
       recent.forEach(function (r) {
-        html += '<button type="button" class="sg-item" data-sg="query" data-q="' + escapeHtml(r) + '"><span class="sg-icn">🕘</span><span class="sg-txt">' + escapeHtml(r) + '</span></button>';
+        html += '<button type="button" class="sg-item" data-sg="query" data-q="' + escapeHtml(r) + '"><span class="sg-icn">⏱</span><span class="sg-txt">' + escapeHtml(r) + '</span></button>';
       });
     }
     if (!html) { box.hidden = true; box.innerHTML = ""; return; }
@@ -8486,14 +8842,14 @@ function renderSuggestions() {
   top.forEach(function (r) {
     var p = r.e.p;
     html += '<button type="button" class="sg-item" data-sg="product" data-id="' + escapeHtml(getProductCartId(p)) + '">' +
-      '<span class="sg-icn">🧴</span><span class="sg-txt">' + markMatch(p.product_name_ar || p.product_name_en, qNorm) + '</span>' +
+      '<span class="sg-icn">›</span><span class="sg-txt">' + markMatch(p.product_name_ar || p.product_name_en, qNorm) + '</span>' +
       '<span class="sg-price">' + fmtPrice(r.e.price) + ' ر.س</span></button>';
   });
   (window.ORDERED_CATS || []).forEach(function (cat) {
     if (html.split("sg-item").length > 8) return;
     var hay = normalizeSearchText(cat.name_ar + " " + cat.name_en);
     if (qNorm.split(" ").every(function (t) { return hay.indexOf(t) !== -1; })) {
-      html += '<button type="button" class="sg-item" data-sg="cat" data-cat="' + escapeHtml(cat.key) + '"><span class="sg-icn">📂</span><span class="sg-txt">قسم: ' + escapeHtml(cat.name_ar) + '</span></button>';
+      html += '<button type="button" class="sg-item" data-sg="cat" data-cat="' + escapeHtml(cat.key) + '"><span class="sg-icn">≡</span><span class="sg-txt">قسم: ' + escapeHtml(cat.name_ar) + '</span></button>';
     }
   });
   html += '<button type="button" class="sg-item sg-all" data-sg="all">عرض جميع النتائج (' + results.length + ')</button>';
@@ -8709,6 +9065,7 @@ function wireShopEvents() {
       '<option value="magazine">ترتيب المجلة</option>' +
       '<option value="relevance">الأكثر صلة</option>' +
       '<option value="discount">أعلى خصم</option>' +
+      '<option value="saving">الأكثر توفيرًا</option>' +
       '<option value="priceAsc">السعر: من الأقل</option>' +
       '<option value="priceDesc">السعر: من الأعلى</option>' +
       '<option value="name">الاسم أ – ي</option>';
@@ -8749,6 +9106,10 @@ function wireShopEvents() {
     renderFilterSheetBody();
   });
   document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") {
+      if (_qvOpen) { closeQuickView(); return; }
+      if (_cartSheetOpen) { closeCartSheet(); return; }
+    }
     if (e.key === "Escape" && _sheetOpen) closeFilterSheet();
     // simple focus trap inside the sheet
     if (e.key === "Tab" && _sheetOpen) {
@@ -8787,20 +9148,49 @@ function wireShopEvents() {
   var toShop = document.getElementById("magazine-to-shop");
   if (toShop) toShop.addEventListener("click", function () { setMode("shop"); });
 
-  // Cart button scrolls to / opens the smart cart bar CTA
+  // Cart button opens the full cart sheet
   var cartBtn = document.getElementById("shop-cart-btn");
-  if (cartBtn) cartBtn.addEventListener("click", function () {
-    var cta = document.getElementById("smart-cart-cta");
-    if (cta && document.body.classList.contains("cart-bar-open")) { cta.click(); }
-    else if (typeof showOrderToast === "function") showOrderToast("سلتك فارغة — أضف منتجات أولًا 🛒");
+  if (cartBtn) cartBtn.addEventListener("click", openCartSheet);
+
+  // Quick view: tap anywhere on a card except its action buttons
+  var gridEl = document.getElementById("shop-grid");
+  if (gridEl) gridEl.addEventListener("click", function (e) {
+    if (e.target.closest("button")) return;
+    var card = e.target.closest(".shop-card[data-shop-id]");
+    if (card) { trackEvent("product_clicked", { id: card.dataset.shopId }); openQuickView(card.dataset.shopId); }
+  });
+  document.addEventListener("click", function (e) {
+    var dv = e.target.closest(".dv-card[data-shop-id]");
+    if (dv) { trackEvent("product_clicked", { id: dv.dataset.shopId, from: "discovery" }); openQuickView(dv.dataset.shopId); return; }
+    var dvAll = e.target.closest(".dv-all[data-dv]");
+    if (dvAll) {
+      if (dvAll.dataset.dv === "hot") { SHOP.hot = true; SHOP.cat = ""; }
+      else if (dvAll.dataset.dv === "saving") { SHOP.sort = "saving"; var ss = document.getElementById("shop-sort"); if (ss) ss.value = "saving"; }
+      shopRefresh();
+      var bar = document.getElementById("shop-results-bar");
+      if (bar) try { bar.scrollIntoView({ behavior: "smooth", block: "start" }); } catch (e2) {}
+    }
   });
 
   // Keep the shop header cart badge + card states in sync (piggyback on delegation)
   document.addEventListener("click", function (e) {
-    if (e.target.closest("[data-cart-add]") || e.target.closest("[data-cart-remove]")) {
-      requestAnimationFrame(syncShopCartUI);
-      var add = e.target.closest("[data-cart-add]");
-      if (add && e.target.closest(".shop-card")) trackEvent("product_added_to_cart", { id: add.dataset.cartAdd });
+    var add = e.target.closest("[data-cart-add]");
+    var rem = e.target.closest("[data-cart-remove]");
+    if (add || rem) {
+      requestAnimationFrame(function () {
+        syncShopCartUI();
+        saveCartToStorage();
+        syncQuickViewCartState();
+        if (_cartSheetOpen) renderCartSheetBody();
+      });
+      if (add) {
+        trackEvent("product_added_to_cart", { id: add.dataset.cartAdd });
+        if (add.classList.contains("sc-add") && typeof showOrderToast === "function") {
+          showOrderToast("تمت الإضافة إلى السلة ✓");
+        }
+      } else if (rem) {
+        trackEvent("quantity_changed", { id: rem.dataset.cartRemove, dir: "down" });
+      }
     }
   });
 
@@ -8813,6 +9203,7 @@ function wireShopEvents() {
   var _scrollT = null;
   window.addEventListener("scroll", function () {
     if (!document.body.classList.contains("shop-mode")) return;
+    onShopScroll();
     clearTimeout(_scrollT);
     _scrollT = setTimeout(function () { SS.set("ocean_shop_scroll", String(Math.round(window.scrollY || 0))); }, 300);
   }, { passive: true });
@@ -8840,6 +9231,250 @@ function syncShopCartUI() {
   });
 }
 
+/* ───────────────── CART PERSISTENCE + CART SHEET ─────────────── */
+function saveCartToStorage() {
+  try {
+    var items = [];
+    CART.forEach(function (v) { items.push(v); });
+    localStorage.setItem("ocean_cart", JSON.stringify(items));
+  } catch (e) {}
+}
+function restoreCartFromStorage() {
+  try {
+    var items = JSON.parse(localStorage.getItem("ocean_cart") || "[]");
+    if (!Array.isArray(items) || !items.length) return;
+    items.forEach(function (it) {
+      if (it && it.id && it.qty > 0) CART.set(it.id, it);
+    });
+    CART.forEach(function (v, id) { try { _syncQtyControl(id); } catch (e) {} });
+    if (typeof updateCartBar === "function") updateCartBar();
+    syncShopCartUI();
+  } catch (e) {}
+}
+function cartTotals() {
+  var items = 0, qty = 0, sum = 0, save = 0;
+  CART.forEach(function (v) {
+    items++; qty += v.qty; sum += v.price * v.qty;
+    if (v.old_price && v.old_price > v.price) save += (v.old_price - v.price) * v.qty;
+  });
+  return { items: items, qty: qty, sum: sum, save: save };
+}
+function cartDeleteItem(id) {
+  CART.delete(id);
+  try { _syncQtyControl(id); } catch (e) {}
+  if (typeof updateCartBar === "function") updateCartBar();
+  saveCartToStorage();
+  syncShopCartUI();
+  renderCartSheetBody();
+  trackEvent("product_removed_from_cart", { id: id, all: true });
+}
+function cartClearAll() {
+  var ids = [];
+  CART.forEach(function (v, id) { ids.push(id); });
+  CART.clear();
+  ids.forEach(function (id) { try { _syncQtyControl(id); } catch (e) {} });
+  if (typeof updateCartBar === "function") updateCartBar();
+  saveCartToStorage();
+  syncShopCartUI();
+  renderCartSheetBody();
+}
+
+var _cartSheetOpen = false;
+function ensureCartSheet() {
+  if (document.getElementById("cart-sheet")) return;
+  var back = document.createElement("div");
+  back.id = "cart-backdrop"; back.className = "sheet-backdrop"; back.hidden = true;
+  var sheet = document.createElement("div");
+  sheet.id = "cart-sheet"; sheet.className = "filter-sheet cart-sheet";
+  sheet.setAttribute("role", "dialog"); sheet.setAttribute("aria-modal", "true");
+  sheet.setAttribute("aria-label", "سلة المشتريات"); sheet.hidden = true;
+  sheet.innerHTML =
+    '<div class="fs-handle" aria-hidden="true"></div>' +
+    '<div class="fs-head"><h2>سلة المشتريات</h2>' +
+    '<button type="button" class="fs-close" id="cart-close" aria-label="إغلاق"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button></div>' +
+    '<div class="fs-body" id="cart-body"></div>' +
+    '<div class="fs-foot cart-foot" id="cart-foot"></div>';
+  document.body.appendChild(back);
+  document.body.appendChild(sheet);
+  back.addEventListener("click", closeCartSheet);
+  document.getElementById("cart-close").addEventListener("click", closeCartSheet);
+  document.getElementById("cart-body").addEventListener("click", function (e) {
+    var del = e.target.closest("[data-cart-delete]");
+    if (del) { cartDeleteItem(del.dataset.cartDelete); return; }
+  });
+}
+function renderCartSheetBody() {
+  var body = document.getElementById("cart-body");
+  var foot = document.getElementById("cart-foot");
+  if (!body || !foot) return;
+  var t = cartTotals();
+  if (!t.items) {
+    body.innerHTML = '<div class="cart-empty"><p>سلتك فارغة</p><span>أضف منتجات من العروض لتظهر هنا.</span></div>';
+    foot.innerHTML = '<button type="button" class="fs-apply" id="cart-continue">متابعة التسوق</button>';
+    var cc = document.getElementById("cart-continue");
+    if (cc) cc.addEventListener("click", closeCartSheet);
+    return;
+  }
+  var rows = "";
+  CART.forEach(function (v, id) {
+    var prodJson = escapeHtml(JSON.stringify(v));
+    rows += '<div class="cart-row">' +
+      '<div class="cr-info"><div class="cr-name">' + escapeHtml(v.name_ar || "صنف") + '</div>' +
+        (v.code ? '<div class="cr-code">' + escapeHtml(v.code) + '</div>' : '') +
+        '<div class="cr-price">' + fmtPrice(v.price) + ' ر.س' +
+        (v.old_price && v.old_price > v.price ? ' <s>' + fmtPrice(v.old_price) + '</s>' : '') + '</div></div>' +
+      '<div class="cr-actions">' +
+        '<div class="product-qty-control" data-qty="' + v.qty + '" data-cart-id="' + escapeHtml(id) + '" role="group" aria-label="الكمية">' +
+          '<button class="qty-btn qty-plus" type="button" data-cart-add="' + escapeHtml(id) + '" data-product=\'' + prodJson + '\' aria-label="زيادة">+</button>' +
+          '<span class="qty-value">' + v.qty + '</span>' +
+          '<button class="qty-btn qty-minus" type="button" data-cart-remove="' + escapeHtml(id) + '" aria-label="تقليل">−</button>' +
+        '</div>' +
+        '<div class="cr-line">' + fmtPrice(v.price * v.qty) + ' ر.س</div>' +
+        '<button type="button" class="cr-del" data-cart-delete="' + escapeHtml(id) + '" aria-label="حذف ' + escapeHtml(v.name_ar || "") + ' من السلة">حذف</button>' +
+      '</div></div>';
+  });
+  body.innerHTML =
+    '<div class="cart-summary">' +
+      '<span>' + t.items + ' ' + (t.items === 1 ? "صنف" : "أصناف") + ' · ' + t.qty + ' قطعة</span>' +
+      (t.save > 0 ? '<span class="cs-save">وفرت ' + fmtPrice(t.save) + ' ر.س</span>' : '') +
+    '</div>' + rows;
+  foot.innerHTML =
+    '<button type="button" class="fs-clear" id="cart-clear">تفريغ السلة</button>' +
+    '<button type="button" class="fs-apply" id="cart-checkout">إتمام الطلب · ' + fmtPrice(t.sum) + ' ر.س</button>';
+  var clr = document.getElementById("cart-clear");
+  if (clr) clr.addEventListener("click", function () {
+    if (window.confirm("هل تريد تفريغ السلة بالكامل؟")) cartClearAll();
+  });
+  var co = document.getElementById("cart-checkout");
+  if (co) co.addEventListener("click", function () {
+    closeCartSheet();
+    trackEvent("checkout_whatsapp_clicked", { total: t.sum, items: t.items });
+    if (typeof handleOrderClick === "function") handleOrderClick();
+  });
+}
+function openCartSheet() {
+  ensureCartSheet();
+  _cartSheetOpen = true;
+  renderCartSheetBody();
+  var sheet = document.getElementById("cart-sheet");
+  var back = document.getElementById("cart-backdrop");
+  back.hidden = false; requestAnimationFrame(function () { if (_cartSheetOpen) back.classList.add("show"); });
+  sheet.hidden = false; requestAnimationFrame(function () { if (_cartSheetOpen) sheet.classList.add("show"); });
+  document.body.classList.add("sheet-open");
+  trackEvent("cart_opened", cartTotals());
+}
+function closeCartSheet() {
+  if (!_cartSheetOpen) return;
+  _cartSheetOpen = false;
+  var sheet = document.getElementById("cart-sheet");
+  var back = document.getElementById("cart-backdrop");
+  if (sheet) { sheet.classList.remove("show"); setTimeout(function () { if (!_cartSheetOpen) sheet.hidden = true; }, 300); }
+  if (back) { back.classList.remove("show"); setTimeout(function () { if (!_cartSheetOpen) back.hidden = true; }, 300); }
+  if (!_sheetOpen) document.body.classList.remove("sheet-open");
+}
+
+/* ─────────────────────── QUICK PRODUCT VIEW ──────────────────── */
+var _qvOpen = false;
+function ensureQuickView() {
+  if (document.getElementById("qv-sheet")) return;
+  var back = document.createElement("div");
+  back.id = "qv-backdrop"; back.className = "sheet-backdrop"; back.hidden = true;
+  var sheet = document.createElement("div");
+  sheet.id = "qv-sheet"; sheet.className = "filter-sheet qv-sheet";
+  sheet.setAttribute("role", "dialog"); sheet.setAttribute("aria-modal", "true");
+  sheet.setAttribute("aria-label", "تفاصيل المنتج"); sheet.hidden = true;
+  sheet.innerHTML =
+    '<div class="fs-handle" aria-hidden="true"></div>' +
+    '<div class="fs-head"><h2>تفاصيل المنتج</h2>' +
+    '<button type="button" class="fs-close" id="qv-close" aria-label="إغلاق"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button></div>' +
+    '<div class="fs-body" id="qv-body"></div>';
+  document.body.appendChild(back);
+  document.body.appendChild(sheet);
+  back.addEventListener("click", closeQuickView);
+  document.getElementById("qv-close").addEventListener("click", closeQuickView);
+}
+function openQuickView(id) {
+  var e = SHOP_ID_MAP.get(id);
+  if (!e) return;
+  ensureQuickView();
+  _qvOpen = true;
+  var p = e.p;
+  var qty = CART.has(id) ? CART.get(id).qty : 0;
+  var oldP = parseFloat(String(p.old_price || "").replace(/[^0-9.]/g, ""));
+  var prodJson = escapeHtml(JSON.stringify({ id: id, name_ar: p.product_name_ar || "صنف", name_en: p.product_name_en || "",
+    code: p.item_code || "", price: e.price, old_price: isFinite(oldP) ? oldP : 0, cat: p.category || "" }));
+  var offerLbl = e.offer === "combo" ? String(p.discount_percent || "").trim()
+               : e.disc ? ("خصم " + e.disc + "%") : "";
+  document.getElementById("qv-body").innerHTML =
+    '<div class="qv-img">' + shopImgHtml(p) + '</div>' +
+    '<h3 class="qv-name">' + escapeHtml(p.product_name_ar || "") + '</h3>' +
+    (p.product_name_en ? '<div class="qv-en">' + escapeHtml(p.product_name_en) + '</div>' : '') +
+    (p.subtitle ? '<div class="qv-sub">' + escapeHtml(p.subtitle) + '</div>' : '') +
+    '<div class="qv-price-row">' +
+      '<span class="qv-price">' + fmtPrice(e.price) + ' <span>ر.س</span></span>' +
+      (isFinite(oldP) && oldP > e.price ? '<span class="qv-old">' + fmtPrice(oldP) + '</span>' : '') +
+      (offerLbl ? '<span class="qv-offer">' + escapeHtml(offerLbl) + '</span>' : '') +
+    '</div>' +
+    (e.save > 0 ? '<div class="qv-save">وفرت ' + fmtPrice(e.save) + ' ر.س</div>' : '') +
+    (p.item_code ? '<div class="qv-code">كود الصنف: ' + escapeHtml(p.item_code) + '</div>' : '') +
+    '<div class="qv-cart" data-incart="' + (qty ? 1 : 0) + '" data-shop-id="' + escapeHtml(id) + '">' +
+      '<button type="button" class="sc-add" data-cart-add="' + escapeHtml(id) + '" data-product=\'' + prodJson + '\'>أضف للسلة</button>' +
+      '<div class="product-qty-control" data-qty="' + qty + '" data-cart-id="' + escapeHtml(id) + '" role="group" aria-label="الكمية">' +
+        '<button class="qty-btn qty-plus" type="button" data-cart-add="' + escapeHtml(id) + '" data-product=\'' + prodJson + '\' aria-label="زيادة">+</button>' +
+        '<span class="qty-value">' + (qty || "أضف") + '</span>' +
+        '<button class="qty-btn qty-minus" type="button" data-cart-remove="' + escapeHtml(id) + '" aria-label="تقليل">−</button>' +
+      '</div>' +
+    '</div>';
+  var back = document.getElementById("qv-backdrop");
+  var sheet = document.getElementById("qv-sheet");
+  back.hidden = false; requestAnimationFrame(function () { if (_qvOpen) back.classList.add("show"); });
+  sheet.hidden = false; requestAnimationFrame(function () { if (_qvOpen) sheet.classList.add("show"); });
+  document.body.classList.add("sheet-open");
+  trackEvent("quick_view_opened", { id: id });
+}
+function closeQuickView() {
+  if (!_qvOpen) return;
+  _qvOpen = false;
+  var sheet = document.getElementById("qv-sheet");
+  var back = document.getElementById("qv-backdrop");
+  if (sheet) { sheet.classList.remove("show"); setTimeout(function () { if (!_qvOpen) sheet.hidden = true; }, 300); }
+  if (back) { back.classList.remove("show"); setTimeout(function () { if (!_qvOpen) back.hidden = true; }, 300); }
+  if (!_sheetOpen && !_cartSheetOpen) document.body.classList.remove("sheet-open");
+}
+function syncQuickViewCartState() {
+  var box = document.querySelector("#qv-sheet .qv-cart");
+  if (!box) return;
+  var id = box.dataset.shopId;
+  box.dataset.incart = CART.has(id) ? 1 : 0;
+}
+
+/* ───────────── ADAPTIVE HEADER + BACK TO TOP ────────────────── */
+function ensureBackToTop() {
+  if (document.getElementById("back-to-top")) return;
+  var b = document.createElement("button");
+  b.type = "button"; b.id = "back-to-top";
+  b.setAttribute("aria-label", "العودة لأعلى الصفحة");
+  b.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 14 6-6 6 6"/></svg>';
+  b.hidden = true;
+  b.addEventListener("click", function () {
+    try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch (e) { try { window.scrollTo(0, 0); } catch (e2) {} }
+  });
+  document.body.appendChild(b);
+}
+var _lastScrollY = 0;
+function onShopScroll() {
+  if (!document.body.classList.contains("shop-mode")) return;
+  var y = window.scrollY || 0;
+  /* compact header: hide the brand row while scrolling down */
+  if (!_sheetOpen && !_cartSheetOpen && !_qvOpen) {
+    if (y > 150 && y > _lastScrollY + 4) document.body.classList.add("sh-compact");
+    else if (y < _lastScrollY - 4 || y < 90) document.body.classList.remove("sh-compact");
+  }
+  _lastScrollY = y;
+  var btt = document.getElementById("back-to-top");
+  if (btt) btt.hidden = y < 700;
+}
+
 /* ─────────────────────────── BOOT ────────────────────────────── */
 var _shopBooted = false;
 function bootShopFromData() {
@@ -8851,6 +9486,7 @@ function bootShopFromData() {
   if (inp && SHOP.q) inp.value = SHOP.q;
   toggleClearBtn();
   renderShopResults();
+  CART.forEach(function (v, id) { try { _syncQtyControl(id); } catch (e) {} });
   syncShopCartUI();
   _shopBooted = true;
 }
@@ -8865,6 +9501,8 @@ function waitForDataAndBoot() {
 function initShopMode() {
   restoreShopState();
   wireShopEvents();
+  ensureBackToTop();
+  restoreCartFromStorage();
   var saved = LS.get("ocean_view_mode", "");
   var mode = saved || "shop"; // shopping-first by default
   setMode(mode, false);
