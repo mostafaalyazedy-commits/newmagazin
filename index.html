@@ -4258,7 +4258,23 @@ body.pdf-export-mode .cover-sub {
 .cover-hero .ph-pro, .hero-product .ph-pro { background: rgba(244,236,219,0.08) !important; }
 .cover-hero .ph-pro .ph-brand, .hero-product .ph-pro .ph-brand { color: rgba(244,236,219,0.75); }
 
-body.shop-mode { padding-top: 0 !important; background: #f4f6f9; }
+body.shop-mode {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  background: #f4f6f9;
+  /* The magazine base styles body as a centered flex column to center the
+     fixed 1240px pages — inside that, #shop-view shrinks to fit-content and
+     the grid explodes to max-content width on phones. Shopping mode needs a
+     normal full-width block flow. */
+  display: block !important;
+  align-items: initial !important;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+  overflow-x: clip;
+}
+#shop-view { width: 100%; max-width: 100vw; }
+.shop-header, .shop-main { width: 100%; }
 body.shop-mode .toolbar,
 body.shop-mode .section-nav,
 body.shop-mode #magazine { display: none !important; }
@@ -4314,7 +4330,7 @@ body:not(.shop-mode) #shop-view { display: none !important; }
 .sh-search {
   width: 100%; height: 48px; border-radius: 14px; border: 1.5px solid rgba(255,255,255,.25);
   background: #fff; color: #14202f;
-  font-family: 'Cairo', sans-serif; font-size: 15.5px; font-weight: 600;
+  font-family: 'Cairo', sans-serif; font-size: 16px; font-weight: 600;
   padding-inline-start: 40px; padding-inline-end: 40px;
   -webkit-appearance: none; appearance: none;
 }
