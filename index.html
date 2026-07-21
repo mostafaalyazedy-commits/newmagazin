@@ -4947,6 +4947,63 @@ html.boot-shop #shop-view[hidden] { display: block !important; }
 @media (prefers-reduced-motion:reduce){#net-status-bar{animation:none;}}
 @media print{#net-status-bar{display:none!important;}}
 
+/* ══════════════════════════════════════════════════════════════
+   COMPACT MOBILE HEADER — more room for products
+   Trims vertical padding + control heights on phones only.
+   Colors, fonts, order and structure are unchanged.
+   Tap targets stay >= 40px (WCAG-safe).
+   ══════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .shop-header { padding: 6px 12px 0; }
+
+  /* Row 1: brand + actions */
+  .sh-row-brand { padding-bottom: 4px; }
+  .sh-btn { min-height: 40px; min-width: 40px; padding: 0 10px; border-radius: 11px; }
+  .sh-brand { font-size: 15.5px; gap: 8px; }
+  .sh-brand .ring { width: 28px; height: 28px; font-size: 13.5px; }
+  .sh-cart-count { min-width: 18px; height: 18px; font-size: 10.5px; }
+
+  /* Row 2: search + filter */
+  .sh-row-search { padding-bottom: 6px; }
+  .sh-search { height: 42px; font-size: 15.5px; border-radius: 12px;
+               padding-inline-start: 36px; padding-inline-end: 36px; }
+  .sh-search-icn { inset-inline-start: 11px; font-size: 14px; }
+  .sh-search-clear { width: 30px; height: 30px; }
+  .sh-filter-btn { height: 42px; padding: 0 12px; border-radius: 12px; font-size: 14px; gap: 6px;
+                   box-shadow: 0 5px 12px rgba(31,132,56,.3); }
+  .sh-filter-count { min-width: 18px; height: 18px; font-size: 11px; }
+
+  /* Row 3: category chips */
+  .sh-row-chips { padding-bottom: 6px; }
+  .sh-chip { min-height: 34px; padding: 0 13px; font-size: 13.5px; }
+
+  /* Row 4: active filter chips */
+  .sh-active-filters { gap: 6px; padding: 0 0 6px; }
+  .af-chip { min-height: 30px; font-size: 12px; padding: 0 5px 0 10px; gap: 6px; }
+  .af-chip .af-x { width: 22px; height: 22px; font-size: 11px; }
+  .af-clear-all { min-height: 30px; font-size: 12px; }
+
+  /* Give the grid the reclaimed space */
+  .shop-main { padding: 10px 12px 120px; }
+}
+
+/* Very small phones (<=380px): trim a little further */
+@media (max-width: 380px) {
+  .shop-header { padding-inline: 10px; }
+  .sh-brand span:not(.ring) { display: none; }   /* logo mark only, keeps row short */
+  .sh-search { height: 40px; }
+  .sh-filter-btn { height: 40px; padding: 0 10px; }
+  .sh-chip { min-height: 32px; padding: 0 11px; font-size: 13px; }
+}
+
+/* Landscape phones: header must never eat the short viewport */
+@media (max-width: 900px) and (orientation: landscape) {
+  .shop-header { padding-top: 4px; }
+  .sh-row-brand { padding-bottom: 2px; }
+  .sh-row-search { padding-bottom: 4px; }
+  .sh-row-chips { padding-bottom: 4px; }
+}
+
 </style>
 </head>
 <body>
