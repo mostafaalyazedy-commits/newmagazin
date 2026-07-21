@@ -4987,21 +4987,89 @@ html.boot-shop #shop-view[hidden] { display: block !important; }
   .shop-main { padding: 10px 12px 120px; }
 }
 
-/* Very small phones (<=380px): trim a little further */
+/* ══════════════════════════════════════════════════════════════
+   ULTRA-COMPACT HEADER (phones) — pass 2
+   Collapses 4 stacked rows into 2 using flex ordering only.
+   No markup changes, no JS changes: every control keeps its id,
+   its listener and its behaviour. Purely visual re-flow.
+   ══════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  /* The header becomes a wrapping flex row so brand+search share line 1 */
+  .shop-header {
+    display: flex; flex-wrap: wrap; align-items: center;
+    gap: 0 8px; padding: 5px 12px 0;
+  }
+
+  /* Line 1: logo (compact) — sits beside the search field */
+  .sh-row-brand {
+    order: 1; flex: 0 0 auto; width: auto;
+    padding-bottom: 0; gap: 6px; justify-content: flex-start;
+  }
+  .sh-row-search {
+    order: 2; flex: 1 1 auto;
+    /* Guard: if the line ever gets too tight the search wraps to its own
+       line instead of being crushed. Behaviour degrades gracefully. */
+    min-width: 190px;
+    padding-bottom: 5px; gap: 7px;
+  }
+
+  /* Logo shrinks to a mark; the cart/menu move to the end of line 1 */
+  .sh-brand { font-size: 0; gap: 0; }
+  .sh-brand .ocean-logo { transform: scale(.82); transform-origin: center; }
+  /* .sh-actions stays a real flex container (display:contents has
+     known VoiceOver/Safari bugs) — it just gets tighter spacing. */
+  .sh-actions { gap: 6px; }
+
+  /* Controls: tighter but still >=38px touch targets */
+  .sh-btn { min-height: 38px; min-width: 38px; padding: 0 9px; border-radius: 10px; }
+  .sh-search { height: 38px; font-size: 15px; border-radius: 11px;
+               padding-inline-start: 34px; padding-inline-end: 34px; }
+  .sh-search-icn { inset-inline-start: 10px; font-size: 13px; }
+  .sh-search-clear { width: 28px; height: 28px; }
+  .sh-filter-btn { height: 38px; padding: 0 11px; border-radius: 11px; font-size: 13.5px; gap: 5px;
+                   box-shadow: 0 4px 10px rgba(31,132,56,.28); }
+  .sh-filter-count { min-width: 17px; height: 17px; font-size: 10.5px; }
+  .sh-cart-count { min-width: 17px; height: 17px; font-size: 10px; top: 0; }
+
+  /* Line 2: category chips AND active filters share one scroll row */
+  .sh-row-chips { order: 4; flex: 1 1 100%; padding-bottom: 5px; }
+  .sh-chip { min-height: 32px; padding: 0 12px; font-size: 13px; }
+
+  .sh-active-filters {
+    order: 5; flex: 1 1 100%;
+    flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none;
+    gap: 6px; padding: 0 0 5px;
+  }
+  .sh-active-filters::-webkit-scrollbar { display: none; }
+  .sh-active-filters > * { flex: 0 0 auto; }
+  .af-chip { min-height: 28px; font-size: 11.5px; padding: 0 4px 0 9px; gap: 5px; }
+  .af-chip .af-x { width: 20px; height: 20px; font-size: 10.5px; }
+  .af-clear-all { min-height: 28px; font-size: 11.5px; }
+
+  /* Suggestions must anchor under the (now shorter) search field */
+  .sh-suggest { order: 6; inset-inline: 12px; }
+
+  .shop-main { padding: 8px 12px 120px; }
+}
+
+/* Very small phones (<=380px) */
 @media (max-width: 380px) {
-  .shop-header { padding-inline: 10px; }
-  .sh-brand span:not(.ring) { display: none; }   /* logo mark only, keeps row short */
-  .sh-search { height: 40px; }
-  .sh-filter-btn { height: 40px; padding: 0 10px; }
-  .sh-chip { min-height: 32px; padding: 0 11px; font-size: 13px; }
+  .shop-header { padding-inline: 10px; gap: 0 6px; }
+  .sh-brand .ocean-logo { transform: scale(.74); }
+  .sh-search { height: 36px; font-size: 14.5px; }
+  .sh-filter-btn { height: 36px; padding: 0 9px; }
+  .sh-filter-lbl { display: none; }   /* icon-only filter button, keeps count badge */
+  .sh-btn { min-height: 36px; min-width: 36px; padding: 0 7px; }
+  .sh-chip { min-height: 30px; padding: 0 10px; font-size: 12.5px; }
 }
 
 /* Landscape phones: header must never eat the short viewport */
 @media (max-width: 900px) and (orientation: landscape) {
-  .shop-header { padding-top: 4px; }
-  .sh-row-brand { padding-bottom: 2px; }
-  .sh-row-search { padding-bottom: 4px; }
-  .sh-row-chips { padding-bottom: 4px; }
+  .shop-header { padding-top: 3px; }
+  .sh-row-brand { padding-bottom: 0; }
+  .sh-row-search { padding-bottom: 3px; }
+  .sh-row-chips { padding-bottom: 3px; }
+  .sh-active-filters { padding-bottom: 3px; }
 }
 
 </style>
