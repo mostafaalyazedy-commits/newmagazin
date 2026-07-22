@@ -4486,7 +4486,7 @@ body:not(.shop-mode) #shop-view { display: none !important; }
 .shop-main > .sh-row-chips .sh-chip[data-chip="cat"] {
   border-color: var(--cat-accent, #0E3D6E);
   background: var(--cat-bg, #FDFAF1);
-  color: var(--cat-deep, #0A2A4D);
+  color: var(--cat-ink, #10233D);
   box-shadow: 0 2px 8px color-mix(in srgb, var(--cat-accent, #0E3D6E) 14%, transparent);
 }
 .shop-main > .sh-row-chips .sh-chip[data-chip="cat"]::before {
@@ -5327,6 +5327,81 @@ html.boot-shop #shop-view[hidden] { display: block !important; }
 }
 @keyframes skShimmer { from { background-position: 200% 0; } to { background-position: -20% 0; } }
 
+/* FINAL STOREFRONT POLISH
+   - The offer red now passes normal-text contrast on white.
+   - Native [hidden] always wins for badges.
+   - The promotional intro uses roughly 35% less vertical space.
+   - Desktop filters/cart/quick view open as focused side drawers. */
+:root { --color-offer: #B5202C; }
+.sh-cart-count[hidden],
+.sh-filter-count[hidden] { display: none !important; }
+.ocean-connection-bar {
+  position: fixed;
+  top: auto;
+  right: auto;
+  bottom: max(14px, calc(10px + env(safe-area-inset-bottom, 0px)));
+  left: 50%;
+  z-index: 1180;
+  width: max-content;
+  max-width: calc(100vw - 86px);
+  min-height: 36px;
+  border-radius: 999px;
+  transform: translateX(-50%);
+}
+body.cart-bar-open .ocean-connection-bar { bottom: 76px; }
+.sc-price, .dv-price, .cr-price { color: #B5202C; }
+.sc-badge {
+  background: linear-gradient(135deg, #C92A37, #A91E2A);
+  box-shadow: 0 6px 14px rgba(181,32,44,.30);
+}
+.dv-badge { background: #B5202C; }
+.dv-badge--offer { background: var(--color-brand-green); }
+.sc-old { color: #66717f; }
+
+.shop-intro {
+  border-radius: 15px;
+  padding: 10px 15px 9px;
+  margin-bottom: 10px;
+  box-shadow: 0 9px 24px rgba(10,42,77,.18);
+}
+.shop-intro::after { top: -13px; font-size: 72px; }
+.shop-intro .si-title { font-size: 19px; line-height: 1.18; }
+.shop-intro .si-sub { margin-top: 3px; font-size: 11.5px; }
+.shop-intro .si-meta { margin-top: 5px; padding: 3px 9px; font-size: 11px; }
+
+@media (max-width: 700px) {
+  .shop-intro { padding: 9px 12px 8px; }
+  .shop-intro::after { font-size: 62px; }
+  .shop-intro .si-title { font-size: 16.5px; }
+  .shop-intro .si-sub {
+    font-size: 10.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .shop-intro .si-meta { margin-top: 4px; padding: 3px 8px; font-size: 10.5px; }
+}
+
+@media (min-width: 701px) {
+  .filter-sheet {
+    top: 0;
+    right: 0;
+    left: auto;
+    bottom: 0;
+    width: min(560px, calc(100vw - 32px));
+    height: 100dvh;
+    max-height: 100dvh;
+    border-radius: 22px 0 0 22px;
+    transform: translateX(105%);
+    box-shadow: -18px 0 60px rgba(10,42,77,.32);
+  }
+  .filter-sheet.show { transform: translateX(0); }
+  .filter-sheet .fs-handle { display: none; }
+  .filter-sheet .fs-head { padding-top: 18px; }
+  .cart-sheet { width: min(640px, calc(100vw - 32px)); }
+  .qv-sheet { width: min(560px, calc(100vw - 32px)); }
+}
+
 </style>
 </head>
 <body>
@@ -5354,7 +5429,7 @@ html.boot-shop #shop-view[hidden] { display: block !important; }
         <input type="search" id="shop-search" class="sh-search" placeholder="ابحث عن منتج، براند، قسم أو كود الصنف" autocomplete="off" enterkeyhint="search" aria-label="بحث في العروض">
         <button type="button" class="sh-search-clear" id="shop-search-clear" aria-label="مسح البحث" hidden><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
       </div>
-      <button type="button" class="sh-filter-btn" id="shop-filter-btn" aria-label="تصفية المنتجات">
+      <button type="button" class="sh-filter-btn" id="shop-filter-btn" aria-label="تصفية المنتجات" aria-haspopup="dialog" aria-controls="filter-sheet">
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/><circle cx="9" cy="7" r="2" fill="currentColor" stroke="none"/><circle cx="15" cy="12" r="2" fill="currentColor" stroke="none"/><circle cx="7" cy="17" r="2" fill="currentColor" stroke="none"/></svg><span class="sh-filter-lbl">فلترة</span><span class="sh-filter-count" id="shop-filter-count" hidden></span>
       </button>
       <div class="sh-actions">
@@ -5369,14 +5444,14 @@ html.boot-shop #shop-view[hidden] { display: block !important; }
     <div class="sh-suggest" id="shop-suggest" hidden role="listbox" aria-label="اقتراحات البحث"></div>
   </header>
 
-  <button type="button" class="floating-cart-btn sh-cart-btn" id="shop-cart-btn" aria-label="فتح سلة المشتريات">
+  <button type="button" class="floating-cart-btn sh-cart-btn" id="shop-cart-btn" aria-label="فتح سلة المشتريات" aria-haspopup="dialog" aria-controls="cart-sheet">
     <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="20" r="1.6"/><circle cx="17" cy="20" r="1.6"/><path d="M3 4h2l2.4 11.2a1.6 1.6 0 0 0 1.6 1.3h7.6a1.6 1.6 0 0 0 1.6-1.3L20 8H6"/></svg>
     <span class="sh-cart-count" id="shop-cart-count" hidden>0</span>
   </button>
 
   <main class="shop-main">
     <div class="sh-row sh-row-chips">
-      <div class="sh-chips" id="shop-chips" role="tablist" aria-label="الأقسام"></div>
+      <div class="sh-chips" id="shop-chips" role="group" aria-label="تصفية حسب القسم"></div>
     </div>
     <div class="sh-active-filters" id="shop-active-filters" hidden></div>
     <section class="shop-intro" id="shop-intro"></section>
@@ -5397,10 +5472,10 @@ html.boot-shop #shop-view[hidden] { display: block !important; }
 
 <!-- Filter Bottom Sheet -->
 <div class="sheet-backdrop" id="filter-backdrop" hidden></div>
-<div class="filter-sheet" id="filter-sheet" role="dialog" aria-modal="true" aria-label="تصفية المنتجات" hidden>
+<div class="filter-sheet" id="filter-sheet" role="dialog" aria-modal="true" aria-labelledby="filter-title" hidden>
   <div class="fs-handle" aria-hidden="true"></div>
   <div class="fs-head">
-    <h2>تصفية المنتجات</h2>
+    <h2 id="filter-title">تصفية المنتجات</h2>
     <button type="button" class="fs-close" id="filter-close" aria-label="إغلاق"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
   </div>
   <div class="fs-body" id="filter-body"></div>
@@ -5479,10 +5554,15 @@ function oceanCacheWrite(key, data) {
   } catch (_) { /* Storage may be unavailable/private/full; live data still works. */ }
 }
 function oceanDelay(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
+function oceanDatasetsEqual(a, b) {
+  if (a === b) return true;
+  try { return JSON.stringify(a) === JSON.stringify(b); }
+  catch (_) { return false; }
+}
 async function oceanFetchJson(url, options) {
   options = options || {};
-  const timeoutMs = options.timeoutMs || 9000;
-  const retries = options.retries == null ? 2 : options.retries;
+  const timeoutMs = options.timeoutMs || 6000;
+  const retries = options.retries == null ? 1 : options.retries;
   let lastError;
   for (let attempt = 0; attempt <= retries; attempt++) {
     const controller = typeof AbortController !== "undefined" ? new AbortController() : null;
@@ -5502,13 +5582,31 @@ async function oceanFetchJson(url, options) {
   }
   throw lastError || new Error("Network request failed");
 }
-async function oceanLoadDataset(key, url) {
+async function oceanLoadDataset(key, url, options) {
+  options = options || {};
+  const cached = oceanCacheRead(key);
+
+  /* Stale-while-revalidate: a last-good response is returned synchronously
+     from localStorage, while a bounded network refresh continues in the
+     background. Optional sheets may also start empty so they never hold the
+     product grid hostage on a first visit. */
+  if (!options.force && (cached || options.allowEmptyCache)) {
+    const initial = cached
+      ? { data: cached.data, source: "cache", timestamp: cached.timestamp }
+      : { data: [], source: "empty" };
+    initial.refreshPromise = oceanFetchJson(url, { timeoutMs: 6000, retries: 1 }).then(data => {
+      const changed = !cached || !oceanDatasetsEqual(cached.data, data);
+      oceanCacheWrite(key, data);
+      return { data: data, source: "network", changed: changed };
+    });
+    return initial;
+  }
+
   try {
-    const data = await oceanFetchJson(url);
+    const data = await oceanFetchJson(url, { timeoutMs: 6000, retries: 1 });
     oceanCacheWrite(key, data);
     return { data: data, source: "network" };
   } catch (error) {
-    const cached = oceanCacheRead(key);
     if (cached) return { data: cached.data, source: "cache", timestamp: cached.timestamp, error: error };
     throw error;
   }
@@ -6295,13 +6393,14 @@ function showStorefrontLoadError(message) {
 }
 
 async function loadMagazine(options) {
+  options = options || {};
   const loadSequence = ++OCEAN_LOAD_SEQUENCE;
   const mount      = document.getElementById("categories-mount");
   const finalMount = document.getElementById("final-page-mount");
   if (!mount) return;
 
   /* Enterprise: skeleton cards instead of bare spinner */
-  if (!SHOP_ONLY_MODE) (function buildSkeleton() {
+  if (!options.silent && !SHOP_ONLY_MODE) (function buildSkeleton() {
     function skelCard() {
       return '<div class="product-card skeleton-card" aria-hidden="true">' +
         '<div class="skel-img"></div>' +
@@ -6316,15 +6415,21 @@ async function loadMagazine(options) {
       '<div class="page-pad" style="position:relative;inset:auto;padding:20px 16px 16px;">' +
       '<div class="grid-4" role="status" aria-busy="true" aria-label="جاري تحميل المنتجات">' + cards + '</div></div></section></div>';
   })();
-  setStatus("جاري التحميل…","");
-  oceanSetConnectionState(navigator.onLine === false ? "offline" : "loading");
+  if (!options.silent) {
+    setStatus("جاري التحميل…","");
+    oceanSetConnectionState(navigator.onLine === false ? "offline" : "loading");
+  }
 
   // Products, categories and settings start together. Optional sheets never
   // delay the product grid, and an older request cannot overwrite a newer one.
+  const supplied = options.datasets || {};
   const [prodResult, catResult, settingsResult] = await Promise.allSettled([
-    oceanLoadDataset("products", PRODUCTS_API_URL),
-    oceanLoadDataset("categories", CATEGORIES_API_URL),
-    oceanLoadDataset("settings", SETTINGS_API_URL)
+    supplied.products ? Promise.resolve(supplied.products) :
+      oceanLoadDataset("products", PRODUCTS_API_URL, { force: !!options.force }),
+    supplied.categories ? Promise.resolve(supplied.categories) :
+      oceanLoadDataset("categories", CATEGORIES_API_URL, { force: !!options.force, allowEmptyCache: true }),
+    supplied.settings ? Promise.resolve(supplied.settings) :
+      oceanLoadDataset("settings", SETTINGS_API_URL, { force: !!options.force, allowEmptyCache: true })
   ]);
   if (loadSequence !== OCEAN_LOAD_SEQUENCE) return;
   if (catResult.status === "fulfilled") await loadCategoryData(catResult.value);
@@ -6346,14 +6451,20 @@ async function loadMagazine(options) {
   }
 
   const rawProducts = prodResult.value.data;
-  const seenProductCodes = new Set();
+  const seenProducts = new Set();
   const products = rawProducts
     .filter(r => r && Object.values(r).some(v=>String(v||"").trim()!=="") && (truthy(r.is_active)||truthy(r.active)))
     .filter(r => {
       const code = String(r.item_code || r.sku || r.code || "").trim();
-      if (!code) return true;
-      if (seenProductCodes.has(code)) return false;
-      seenProductCodes.add(code);
+      const fallback = [
+        r.product_name_ar || r.product_name || r.name_ar || r.name || "",
+        r.category || "",
+        r.volume || r.size || r.subtitle || "",
+        r.new_price || r.offer_price || r.sale_price || r.price || ""
+      ].map(v => String(v || "").trim().toLowerCase()).join("|");
+      const identity = code ? "code:" + code.toLowerCase() : "row:" + fallback;
+      if (seenProducts.has(identity)) return false;
+      seenProducts.add(identity);
       return true;
     })
     .map((row, idx) => enrichProduct({...row}, idx));
@@ -6387,6 +6498,54 @@ async function loadMagazine(options) {
     (settingsResult.status === "fulfilled" && settingsResult.value.source === "cache");
   oceanSetConnectionState(usedCache ? (navigator.onLine === false ? "offline" : "cached") : "online");
 
+  /* Notify the shopping renderer when a silent background refresh replaces
+     the data. Its current search/filter state is preserved. */
+  try {
+    window.dispatchEvent(new CustomEvent("ocean:products-updated", {
+      detail: { source: prodResult.value.source, background: !!options.background }
+    }));
+  } catch (_) {}
+
+  /* Attach to any stale-while-revalidate requests only after the cached UI is
+     already visible. One consolidated repaint avoids three separate jumps. */
+  if (!options.skipBackground) {
+    const entries = [
+      { name: "products", base: prodResult },
+      { name: "categories", base: catResult },
+      { name: "settings", base: settingsResult }
+    ];
+    const hasRefresh = entries.some(entry =>
+      entry.base.status === "fulfilled" && entry.base.value && entry.base.value.refreshPromise
+    );
+    if (hasRefresh) {
+      Promise.allSettled(entries.map(entry =>
+        entry.base.status === "fulfilled" && entry.base.value.refreshPromise
+          ? entry.base.value.refreshPromise
+          : Promise.resolve(null)
+      )).then(freshResults => {
+        if (loadSequence !== OCEAN_LOAD_SEQUENCE) return;
+        let changed = false;
+        let anySuccess = false;
+        const datasets = {};
+        entries.forEach((entry, index) => {
+          const fresh = freshResults[index];
+          if (fresh.status === "fulfilled" && fresh.value) {
+            datasets[entry.name] = fresh.value;
+            changed = changed || !!fresh.value.changed;
+            anySuccess = true;
+          } else if (entry.base.status === "fulfilled") {
+            datasets[entry.name] = entry.base.value;
+          }
+        });
+        if (changed && datasets.products) {
+          loadMagazine({ datasets: datasets, skipBackground: true, silent: true, background: true });
+        } else if (anySuccess) {
+          oceanSetConnectionState("online");
+        }
+      });
+    }
+  }
+
   /* Enterprise: update result count + value classes after full load */
   if (typeof upsertResultCount === "function") upsertResultCount();
 }
@@ -6409,7 +6568,7 @@ function wireToolbar() {
   if (refresh) refresh.addEventListener("click", () => loadMagazine());
   /* PDF export: real per-page PDF (html2canvas + jsPDF). Ctrl+P / browser print
      still works via the existing @media print styles. */
-  if (print)   print.addEventListener("click",   () => exportMagazinePDF());
+  if (print)   print.addEventListener("click",   () => requestMagazinePDF());
 }
 
 /* ================================================================
@@ -7242,7 +7401,7 @@ window.addEventListener("online", function () {
 });
 </script>
 
-<script>
+<script type="text/plain" id="ocean-magazine-extras-module">
 /* Portrait Auto-Detect: marks tall product images with .portrait class */
 function detectPortraitImages() {
   document.querySelectorAll('.product-image img, .pi-img-wrap img').forEach(img => {
@@ -7880,7 +8039,7 @@ document.addEventListener("keydown", function tocKeyHandler(e) {
 });
 </script>
   
-  <script>
+  <script type="text/plain" id="ocean-magazine-cover-module">
 /* FIX: Cover image using lh3 */
 (function() {
   var _orig = window.updateCoverImage;
@@ -7908,7 +8067,7 @@ document.addEventListener("keydown", function tocKeyHandler(e) {
 </script>
   
 
-<script>
+<script type="text/plain" id="ocean-magazine-layout-module">
 /* ════════════════════════════════════════════════════════════════
    PAGE OVERFLOW GUARD — measurement-based rebalancing
    Runs after every render on the fixed desktop layout (>700px).
@@ -8066,7 +8225,7 @@ window.renumberMagazinePages = renumberMagazinePages;
 })();
 </script>
 
-<script>
+<script type="text/plain" id="ocean-pdf-export-module">
 /* ════════════════════════════════════════════════════════════════
    PDF EXPORT ENGINE v2 — sandbox capture, browser-native rendering
    ────────────────────────────────────────────────────────────────
@@ -8719,6 +8878,62 @@ window.__stripMobileMedia = stripMobileMedia; /* exposed for self-tests */
 
 </script>
 
+<script>
+/* Magazine/PDF features are deliberately inert on the storefront. Their
+   source blocks above are compiled only after an explicit request. */
+(function () {
+  "use strict";
+  var loaded = Object.create(null);
+  var magazinePromise = null;
+  var pdfPromise = null;
+
+  function executeDeferredModule(id) {
+    if (loaded[id]) return;
+    var source = document.getElementById(id);
+    if (!source) throw new Error("Deferred module not found: " + id);
+    var script = document.createElement("script");
+    script.text = source.textContent || "";
+    script.setAttribute("data-ocean-loaded-module", id);
+    document.head.appendChild(script);
+    loaded[id] = true;
+  }
+
+  window.loadOceanMagazineModules = function () {
+    if (magazinePromise) return magazinePromise;
+    magazinePromise = Promise.resolve().then(function () {
+      executeDeferredModule("ocean-magazine-extras-module");
+      executeDeferredModule("ocean-magazine-cover-module");
+      executeDeferredModule("ocean-magazine-layout-module");
+    });
+    return magazinePromise;
+  };
+
+  window.loadOceanPdfModule = function () {
+    if (typeof window.exportMagazinePDF === "function") return Promise.resolve();
+    if (pdfPromise) return pdfPromise;
+    pdfPromise = window.loadOceanMagazineModules().then(function () {
+      executeDeferredModule("ocean-pdf-export-module");
+      if (typeof window.exportMagazinePDF !== "function") {
+        throw new Error("تعذر تهيئة أداة PDF.");
+      }
+    });
+    return pdfPromise;
+  };
+
+  window.requestMagazinePDF = function () {
+    return window.loadOceanPdfModule()
+      .then(function () { return window.exportMagazinePDF(); })
+      .catch(function (error) {
+        console.error("[PDF] lazy load failed:", error);
+        if (typeof showOrderToast === "function") {
+          showOrderToast("تعذر تشغيل أداة PDF. حاول مرة أخرى.", 4200);
+        }
+        return null;
+      });
+  };
+})();
+</script>
+
 
 <script>
 /* ════════════════════════════════════════════════════════════════
@@ -9243,7 +9458,9 @@ function renderShopDiscovery() {
 
   var byDisc = SEARCH_INDEX.filter(function (e) { return e.disc >= 20; })
     .sort(function (a, b) { return b.disc - a.disc; }).slice(0, 8);
+  var discoverySeen = new Set(byDisc.map(function (e) { return e.id; }));
   var bySave = SEARCH_INDEX.filter(function (e) { return e.save > 0; })
+    .filter(function (e) { return !discoverySeen.has(e.id); })
     .sort(function (a, b) { return b.save - a.save; }).slice(0, 8);
 
   var html = "";
@@ -9322,13 +9539,27 @@ function shopSafeHex(value, fallback) {
   }
   return v.toUpperCase();
 }
-function shopContrastText(hex) {
-  var v = shopSafeHex(hex, "#0E3D6E").slice(1);
-  var r = parseInt(v.slice(0, 2), 16);
-  var g = parseInt(v.slice(2, 4), 16);
-  var b = parseInt(v.slice(4, 6), 16);
-  /* Perceived brightness keeps pale/yellow backend colours readable. */
-  return ((r * 299 + g * 587 + b * 114) / 1000) > 168 ? "#10233D" : "#FFFFFF";
+function shopContrastText(hex, secondHex) {
+  function luminance(value) {
+    var v = shopSafeHex(value, "#0E3D6E").slice(1);
+    var rgb = [v.slice(0, 2), v.slice(2, 4), v.slice(4, 6)].map(function (part) {
+      var c = parseInt(part, 16) / 255;
+      return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+    });
+    return 0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2];
+  }
+  var surfaces = [hex];
+  if (secondHex) surfaces.push(secondHex);
+  var darkLum = luminance("#10233D");
+  var whiteWorst = Infinity;
+  var darkWorst = Infinity;
+  surfaces.forEach(function (surface) {
+    var surfaceLum = luminance(surface);
+    whiteWorst = Math.min(whiteWorst, 1.05 / (surfaceLum + 0.05));
+    darkWorst = Math.min(darkWorst, (Math.max(surfaceLum, darkLum) + 0.05) /
+      (Math.min(surfaceLum, darkLum) + 0.05));
+  });
+  return whiteWorst >= darkWorst ? "#FFFFFF" : "#10233D";
 }
 function renderShopChips() {
   var wrap = document.getElementById("shop-chips");
@@ -9339,8 +9570,9 @@ function renderShopChips() {
     var accent = shopSafeHex(cat.accent, "#0E3D6E");
     var deep = shopSafeHex(cat.accent_deep, accent);
     var bg = shopSafeHex(cat.bg, "#FDFAF1");
-    var on = shopContrastText(accent);
-    html += '<button type="button" class="sh-chip" data-chip="cat" data-cat="' + escapeHtml(cat.key) + '" style="--cat-accent:' + accent + ';--cat-deep:' + deep + ';--cat-bg:' + bg + ';--cat-on:' + on + '">' + escapeHtml(cat.name_ar) + '</button>';
+    var on = shopContrastText(accent, deep);
+    var ink = shopContrastText(bg);
+    html += '<button type="button" class="sh-chip" data-chip="cat" data-cat="' + escapeHtml(cat.key) + '" style="--cat-accent:' + accent + ';--cat-deep:' + deep + ';--cat-bg:' + bg + ';--cat-on:' + on + ';--cat-ink:' + ink + '">' + escapeHtml(cat.name_ar) + '</button>';
   });
   wrap.innerHTML = html;
   syncChipsUI();
@@ -9497,6 +9729,9 @@ function renderFilterSheetBody() {
       '</div></div>';
   }
   body.innerHTML = html;
+  body.querySelectorAll(".fs-opt").forEach(function (button) {
+    button.setAttribute("aria-pressed", button.classList.contains("is-on") ? "true" : "false");
+  });
   updateSheetApplyLabel();
 }
 function updateSheetApplyLabel() {
@@ -9684,10 +9919,10 @@ function wireShopEvents() {
       if (_cartSheetOpen) { closeCartSheet(); return; }
     }
     if (e.key === "Escape" && _sheetOpen) closeFilterSheet();
-    // simple focus trap inside the sheet
-    if (e.key === "Tab" && _sheetOpen) {
-      var sheet = document.getElementById("filter-sheet");
-      var focusables = sheet ? sheet.querySelectorAll("button, select, input, [tabindex]") : [];
+    // Keep keyboard focus inside whichever dialog is currently open.
+    if (e.key === "Tab" && (_sheetOpen || _cartSheetOpen || _qvOpen)) {
+      var activeSheet = document.getElementById(_qvOpen ? "qv-sheet" : (_cartSheetOpen ? "cart-sheet" : "filter-sheet"));
+      var focusables = activeSheet ? activeSheet.querySelectorAll("button, select, input, [tabindex]:not([tabindex='-1'])") : [];
       if (!focusables.length) return;
       var first = focusables[0], last = focusables[focusables.length - 1];
       if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
@@ -9702,7 +9937,7 @@ function wireShopEvents() {
   var mPdf = document.getElementById("shop-menu-pdf");
   if (mPdf) mPdf.addEventListener("click", function () {
     toggleMoreMenu(false);
-    if (typeof exportMagazinePDF === "function") exportMagazinePDF();
+    if (typeof requestMagazinePDF === "function") requestMagazinePDF();
   });
   var mRefresh = document.getElementById("shop-menu-refresh");
   if (mRefresh) mRefresh.addEventListener("click", function () {
@@ -9852,7 +10087,7 @@ function cartClearAll() {
   renderCartSheetBody();
 }
 
-var _cartSheetOpen = false;
+var _cartSheetOpen = false, _cartLastFocus = null;
 function ensureCartSheet() {
   if (document.getElementById("cart-sheet")) return;
   var back = document.createElement("div");
@@ -9860,10 +10095,10 @@ function ensureCartSheet() {
   var sheet = document.createElement("div");
   sheet.id = "cart-sheet"; sheet.className = "filter-sheet cart-sheet";
   sheet.setAttribute("role", "dialog"); sheet.setAttribute("aria-modal", "true");
-  sheet.setAttribute("aria-label", "سلة المشتريات"); sheet.hidden = true;
+  sheet.setAttribute("aria-labelledby", "cart-title"); sheet.hidden = true;
   sheet.innerHTML =
     '<div class="fs-handle" aria-hidden="true"></div>' +
-    '<div class="fs-head"><h2>سلة المشتريات</h2>' +
+    '<div class="fs-head"><h2 id="cart-title">سلة المشتريات</h2>' +
     '<button type="button" class="fs-close" id="cart-close" aria-label="إغلاق"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button></div>' +
     '<div class="fs-body" id="cart-body"></div>' +
     '<div class="fs-foot cart-foot" id="cart-foot"></div>';
@@ -9928,12 +10163,15 @@ function renderCartSheetBody() {
 function openCartSheet() {
   ensureCartSheet();
   _cartSheetOpen = true;
+  _cartLastFocus = document.activeElement;
   renderCartSheetBody();
   var sheet = document.getElementById("cart-sheet");
   var back = document.getElementById("cart-backdrop");
   back.hidden = false; requestAnimationFrame(function () { if (_cartSheetOpen) back.classList.add("show"); });
   sheet.hidden = false; requestAnimationFrame(function () { if (_cartSheetOpen) sheet.classList.add("show"); });
   document.body.classList.add("sheet-open");
+  var closeBtn = document.getElementById("cart-close");
+  if (closeBtn) setTimeout(function () { if (_cartSheetOpen) closeBtn.focus(); }, 120);
   trackEvent("cart_opened", cartTotals());
 }
 function closeCartSheet() {
@@ -9943,11 +10181,12 @@ function closeCartSheet() {
   var back = document.getElementById("cart-backdrop");
   if (sheet) { sheet.classList.remove("show"); setTimeout(function () { if (!_cartSheetOpen) sheet.hidden = true; }, 300); }
   if (back) { back.classList.remove("show"); setTimeout(function () { if (!_cartSheetOpen) back.hidden = true; }, 300); }
-  if (!_sheetOpen) document.body.classList.remove("sheet-open");
+  if (!_sheetOpen && !_qvOpen) document.body.classList.remove("sheet-open");
+  if (_cartLastFocus && _cartLastFocus.focus) { try { _cartLastFocus.focus(); } catch (e) {} }
 }
 
 /* ─────────────────────── QUICK PRODUCT VIEW ──────────────────── */
-var _qvOpen = false;
+var _qvOpen = false, _qvLastFocus = null;
 function ensureQuickView() {
   if (document.getElementById("qv-sheet")) return;
   var back = document.createElement("div");
@@ -9955,10 +10194,10 @@ function ensureQuickView() {
   var sheet = document.createElement("div");
   sheet.id = "qv-sheet"; sheet.className = "filter-sheet qv-sheet";
   sheet.setAttribute("role", "dialog"); sheet.setAttribute("aria-modal", "true");
-  sheet.setAttribute("aria-label", "تفاصيل المنتج"); sheet.hidden = true;
+  sheet.setAttribute("aria-labelledby", "qv-title"); sheet.hidden = true;
   sheet.innerHTML =
     '<div class="fs-handle" aria-hidden="true"></div>' +
-    '<div class="fs-head"><h2>تفاصيل المنتج</h2>' +
+    '<div class="fs-head"><h2 id="qv-title">تفاصيل المنتج</h2>' +
     '<button type="button" class="fs-close" id="qv-close" aria-label="إغلاق"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button></div>' +
     '<div class="fs-body" id="qv-body"></div>';
   document.body.appendChild(back);
@@ -9971,6 +10210,7 @@ function openQuickView(id) {
   if (!e) return;
   ensureQuickView();
   _qvOpen = true;
+  _qvLastFocus = document.activeElement;
   var p = e.p;
   var qty = CART.has(id) ? CART.get(id).qty : 0;
   var oldP = parseFloat(String(p.old_price || "").replace(/[^0-9.]/g, ""));
@@ -10003,6 +10243,8 @@ function openQuickView(id) {
   back.hidden = false; requestAnimationFrame(function () { if (_qvOpen) back.classList.add("show"); });
   sheet.hidden = false; requestAnimationFrame(function () { if (_qvOpen) sheet.classList.add("show"); });
   document.body.classList.add("sheet-open");
+  var closeBtn = document.getElementById("qv-close");
+  if (closeBtn) setTimeout(function () { if (_qvOpen) closeBtn.focus(); }, 120);
   trackEvent("quick_view_opened", { id: id });
 }
 function closeQuickView() {
@@ -10013,6 +10255,7 @@ function closeQuickView() {
   if (sheet) { sheet.classList.remove("show"); setTimeout(function () { if (!_qvOpen) sheet.hidden = true; }, 300); }
   if (back) { back.classList.remove("show"); setTimeout(function () { if (!_qvOpen) back.hidden = true; }, 300); }
   if (!_sheetOpen && !_cartSheetOpen) document.body.classList.remove("sheet-open");
+  if (_qvLastFocus && _qvLastFocus.focus) { try { _qvLastFocus.focus(); } catch (e) {} }
 }
 function syncQuickViewCartState() {
   var box = document.querySelector("#qv-sheet .qv-cart");
@@ -10049,6 +10292,14 @@ function onShopScroll() {
 
 /* ─────────────────────────── BOOT ────────────────────────────── */
 var _shopBooted = false;
+window.addEventListener("ocean:products-updated", function () {
+  if (!_shopBooted || !window.ALL_PRODUCTS || !window.ALL_PRODUCTS.length) return;
+  buildSearchIndex();
+  renderShopChips();
+  renderShopIntro();
+  renderShopResults();
+  syncShopCartUI();
+});
 function bootShopFromData() {
   if (!window.ALL_PRODUCTS || !window.ALL_PRODUCTS.length) return;
   buildSearchIndex();
