@@ -4369,6 +4369,9 @@ body:not(.shop-mode) #shop-view { display: none !important; }
 .sh-more-menu button:hover, .sh-more-menu button:focus-visible { background: #f0f4f8; }
 
 .sh-row-search { padding-bottom: 10px; }
+.sh-row-primary .sh-brand { flex: 0 0 auto; }
+.sh-row-primary .sh-search-wrap { flex: 1 1 auto; }
+.sh-row-primary .sh-actions { flex: 0 0 auto; }
 .sh-search-wrap { position: relative; flex: 1 1 auto; min-width: 0; }
 .sh-search-icn { position: absolute; inset-inline-start: 13px; top: 50%; transform: translateY(-50%); font-size: 15px; opacity: .55; pointer-events: none; }
 .sh-search {
@@ -4449,6 +4452,53 @@ body:not(.shop-mode) #shop-view { display: none !important; }
 }
 .af-chip .af-x { width: 26px; height: 26px; border-radius: 50%; border: 0; background: rgba(0,0,0,.14); color: inherit; font-size: 12px; cursor: pointer; }
 .af-clear-all { border: 0; background: none; color: #FFE9A8; font-family: 'Cairo', sans-serif; font-weight: 800; font-size: 13px; min-height: 36px; cursor: pointer; text-decoration: underline; }
+
+/* Active filters belong to the results, not the sticky navigation. Keeping
+   them in the document flow saves a complete header row on small screens. */
+.shop-main > .sh-active-filters {
+  flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none;
+  margin: 0 0 10px; padding: 0 0 2px; min-height: 38px;
+  align-items: center; -webkit-overflow-scrolling: touch;
+}
+.shop-main > .sh-active-filters::-webkit-scrollbar { display: none; }
+.shop-main > .sh-active-filters .af-chip,
+.shop-main > .sh-active-filters .af-clear-all { flex: 0 0 auto; }
+.shop-main > .sh-active-filters .af-clear-all { color: #0E3D6E; }
+.shop-main > .sh-row-chips {
+  padding: 0 0 10px;
+}
+.shop-main > .sh-row-chips .sh-chip {
+  border-color: #d7e0ea; background: #fff; color: #0E3D6E;
+  box-shadow: 0 2px 8px rgba(10,42,77,.06);
+}
+.shop-main > .sh-row-chips .sh-chip.is-active {
+  background: #0E3D6E; color: #fff; border-color: #0E3D6E;
+  box-shadow: 0 5px 12px rgba(10,42,77,.18);
+}
+.shop-main > .sh-row-chips .sh-chip.chip-hot.is-active {
+  background: #E63946; border-color: #E63946;
+}
+
+@media (max-width: 700px) {
+  .shop-header { padding: 5px 8px; }
+  .sh-row-primary { gap: 5px; padding: 0; }
+  body.shop-mode .ocean-logo--header { width: 42px; height: 40px; padding: 3px; border-radius: 9px; }
+  body.shop-mode .ocean-logo--header .ocean-logo__image { width: 100%; height: 32px; }
+  .sh-actions { gap: 4px; }
+  .sh-btn { min-height: 40px; min-width: 40px; width: 40px; padding: 0; border-radius: 10px; }
+  .sh-search, .sh-filter-btn { height: 40px; border-radius: 10px; }
+  .sh-search { font-size: 13px; padding-inline-start: 34px; padding-inline-end: 32px; }
+  .sh-search-icn { inset-inline-start: 10px; }
+  .sh-filter-btn { width: 40px; padding: 0; justify-content: center; box-shadow: none; }
+  .sh-filter-lbl { display: none; }
+  .sh-filter-count { position: absolute; top: -5px; inset-inline-start: -4px; min-width: 18px; height: 18px; font-size: 10px; }
+  .shop-main > .sh-row-chips,
+  .shop-main > .sh-active-filters { display: none !important; }
+}
+
+@media (max-width: 380px) {
+  body.shop-mode .ocean-logo--header { display: none; }
+}
 
 /* ── Main ── */
 .shop-main { max-width: 1240px; margin: 0 auto; padding: 14px 14px 120px; }
@@ -4883,6 +4933,176 @@ body.sh-compact .sh-row-brand {
 body.cart-bar-open #back-to-top { bottom: 86px; }
 body:not(.shop-mode) #back-to-top { display: none; }
 
+/* Compact mobile cart dock: keep the order action visible without covering
+   a large part of the product grid. These final overrides intentionally sit
+   after the legacy mobile rules. */
+@media (max-width: 700px) {
+  .smart-cart-bar {
+    padding-inline: 8px !important;
+  }
+  .smart-cart-inner {
+    padding: 8px 10px 10px !important;
+    gap: 8px !important;
+    border-radius: 13px 13px 0 0 !important;
+  }
+  .smart-cart-summary .sc-count {
+    font-size: 10.5px !important;
+    letter-spacing: 0 !important;
+  }
+  .smart-cart-summary .sc-total {
+    font-size: 16px !important;
+    line-height: 1.1 !important;
+  }
+  .smart-cart-summary .sc-total span { font-size: 11px !important; }
+  .smart-cart-cta {
+    min-height: 42px !important;
+    padding: 8px 10px !important;
+    border-radius: 9px !important;
+    font-size: 12.5px !important;
+    line-height: 1.2 !important;
+    gap: 6px !important;
+  }
+  .smart-cart-cta .wa-ic { width: 18px !important; height: 18px !important; }
+  body.cart-bar-open { padding-bottom: calc(68px + env(safe-area-inset-bottom, 0px)) !important; }
+  #back-to-top { width: 40px; height: 40px; inset-inline-end: 12px; }
+  #back-to-top svg { width: 17px; height: 17px; }
+  body.cart-bar-open #back-to-top { bottom: 68px; }
+}
+
+/* ULTRA-COMPACT MOBILE CHROME — final authority.
+   Keep only essential shopping controls fixed and release the viewport to
+   the product grid. This block also neutralizes older three-row headers if a
+   cached markup revision is served during deployment. */
+@media (max-width: 700px) {
+  .shop-header {
+    padding: 3px 6px !important;
+    min-height: 0 !important;
+  }
+  .shop-header > .sh-row-brand,
+  .shop-header > .sh-row-chips,
+  .shop-header > .sh-active-filters { display: none !important; }
+  .sh-row-primary {
+    min-height: 36px !important;
+    gap: 4px !important;
+  }
+  .sh-row-primary .sh-brand,
+  .sh-row-primary .sh-more-wrap { display: none !important; }
+  .sh-row-primary .sh-search,
+  .sh-row-primary .sh-filter-btn,
+  .sh-row-primary .sh-btn {
+    height: 36px !important;
+    min-height: 36px !important;
+  }
+  .sh-row-primary .sh-search { font-size: 12px !important; }
+  .sh-row-primary .sh-filter-btn,
+  .sh-row-primary .sh-btn { width: 36px !important; min-width: 36px !important; }
+  .sh-row-primary .sh-search-icn svg { width: 16px; height: 16px; }
+  .sh-row-primary .sh-cart-btn svg { width: 18px; height: 18px; }
+  .sh-cart-count { top: -3px; inset-inline-start: -3px; }
+
+  .smart-cart-bar { padding-inline: 6px !important; }
+  .smart-cart-inner {
+    padding: 5px 7px 6px !important;
+    gap: 6px !important;
+    border-radius: 11px 11px 0 0 !important;
+  }
+  .smart-cart-summary .sc-count { display: none !important; }
+  .smart-cart-summary .sc-total {
+    font-size: 14px !important;
+    line-height: 1 !important;
+  }
+  .smart-cart-summary .sc-total span { font-size: 10px !important; }
+  .smart-cart-cta {
+    min-height: 36px !important;
+    padding: 6px 9px !important;
+    border-radius: 8px !important;
+    font-size: 11.5px !important;
+    gap: 5px !important;
+  }
+  .smart-cart-cta .wa-ic { width: 16px !important; height: 16px !important; }
+  body.cart-bar-open { padding-bottom: calc(52px + env(safe-area-inset-bottom, 0px)) !important; }
+  #back-to-top {
+    width: 34px !important; height: 34px !important;
+    inset-inline-end: 9px !important;
+  }
+  #back-to-top svg { width: 15px !important; height: 15px !important; }
+  body.cart-bar-open #back-to-top { bottom: 54px !important; }
+}
+
+/* MAXIMUM PRODUCT VIEW — mobile.
+   The header participates in normal flow (no viewport obstruction while
+   browsing) and the checkout becomes a small floating pill. */
+@media (max-width: 700px) {
+  .shop-header {
+    position: relative !important;
+    top: auto !important;
+    box-shadow: 0 3px 10px rgba(10,42,77,.16) !important;
+  }
+  .smart-cart-bar {
+    justify-content: center !important;
+    padding: 0 6px calc(5px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+  .smart-cart-inner {
+    width: auto !important;
+    min-width: 190px !important;
+    max-width: 230px !important;
+    padding: 4px 5px !important;
+    border-radius: 12px !important;
+    gap: 5px !important;
+    box-shadow: 0 5px 18px rgba(10,42,77,.32) !important;
+  }
+  .smart-cart-summary { flex: 0 1 auto !important; }
+  .smart-cart-summary .sc-total { font-size: 13px !important; }
+  .smart-cart-cta {
+    width: 72px !important;
+    min-height: 32px !important;
+    height: 32px !important;
+    padding: 4px 7px !important;
+    font-size: 0 !important;
+    justify-content: center !important;
+  }
+  .smart-cart-cta::after {
+    content: "اطلب";
+    font-family: 'Cairo', sans-serif;
+    font-size: 11px;
+    font-weight: 800;
+  }
+  .smart-cart-cta .wa-ic { width: 15px !important; height: 15px !important; }
+  body.cart-bar-open { padding-bottom: calc(46px + env(safe-area-inset-bottom, 0px)) !important; }
+  #back-to-top { display: none !important; }
+}
+
+/* Category navigation is essential, but it must not consume sticky viewport
+   space. Show it as one compact, horizontally scrollable row in page flow. */
+@media (max-width: 700px) {
+  .shop-main > .sh-row-chips {
+    display: flex !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 860 !important;
+    padding: 5px 0 !important;
+    margin: -5px 0 7px !important;
+    background: rgba(244,246,249,.96) !important;
+    border-bottom: 1px solid rgba(14,61,110,.08) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  .shop-main > .sh-row-chips .sh-chips {
+    display: flex !important;
+    gap: 5px !important;
+    padding: 1px !important;
+    margin: 0 !important;
+  }
+  .shop-main > .sh-row-chips .sh-chip {
+    min-height: 32px !important;
+    height: 32px !important;
+    padding: 0 10px !important;
+    font-size: 11.5px !important;
+    border-width: 1px !important;
+    box-shadow: none !important;
+  }
+}
+
 /* Shopping chrome (v2) never leaks into PDF/print */
 @media print {
   #shop-discover, #shop-load-more, #back-to-top, #cart-sheet, #cart-backdrop, #qv-sheet, #qv-backdrop { display: none !important; }
@@ -4942,8 +5162,16 @@ html.boot-shop #shop-view[hidden] { display: block !important; }
      PDF export / print — the two modes never interfere. -->
 <div id="shop-view" hidden>
   <header class="shop-header" id="shop-header">
-    <div class="sh-row sh-row-brand">
+    <div class="sh-row sh-row-search sh-row-primary">
       <div class="sh-brand"><span class="ocean-logo ocean-logo--header ocean-logo--chip"><img class="ocean-logo__image" src="./ocean-pharmacy-logo-optimized.png" alt="صيدلية أوشن - Ocean Pharmacy" decoding="async" onerror="this.closest(&quot;.ocean-logo&quot;).classList.add(&quot;logo-missing&quot;)"><span class="ocean-logo__fallback">صيدلية أوشن</span></span></div>
+      <div class="sh-search-wrap">
+        <span class="sh-search-icn" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="20" y1="20" x2="16.5" y2="16.5"/></svg></span>
+        <input type="search" id="shop-search" class="sh-search" placeholder="ابحث عن منتج، براند، قسم أو كود الصنف" autocomplete="off" enterkeyhint="search" aria-label="بحث في العروض">
+        <button type="button" class="sh-search-clear" id="shop-search-clear" aria-label="مسح البحث" hidden><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
+      </div>
+      <button type="button" class="sh-filter-btn" id="shop-filter-btn" aria-label="تصفية المنتجات">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/><circle cx="9" cy="7" r="2" fill="currentColor" stroke="none"/><circle cx="15" cy="12" r="2" fill="currentColor" stroke="none"/><circle cx="7" cy="17" r="2" fill="currentColor" stroke="none"/></svg><span class="sh-filter-lbl">فلترة</span><span class="sh-filter-count" id="shop-filter-count" hidden></span>
+      </button>
       <div class="sh-actions">
         <button type="button" class="sh-btn sh-cart-btn" id="shop-cart-btn" aria-label="السلة"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="20" r="1.6"/><circle cx="17" cy="20" r="1.6"/><path d="M3 4h2l2.4 11.2a1.6 1.6 0 0 0 1.6 1.3h7.6a1.6 1.6 0 0 0 1.6-1.3L20 8H6"/></svg><span class="sh-cart-count" id="shop-cart-count" hidden>0</span></button>
         <div class="sh-more-wrap">
@@ -4954,24 +5182,14 @@ html.boot-shop #shop-view[hidden] { display: block !important; }
         </div>
       </div>
     </div>
-    <div class="sh-row sh-row-search">
-      <div class="sh-search-wrap">
-        <span class="sh-search-icn" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="20" y1="20" x2="16.5" y2="16.5"/></svg></span>
-        <input type="search" id="shop-search" class="sh-search" placeholder="ابحث عن منتج، براند، قسم أو كود الصنف" autocomplete="off" enterkeyhint="search" aria-label="بحث في العروض">
-        <button type="button" class="sh-search-clear" id="shop-search-clear" aria-label="مسح البحث" hidden><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
-      </div>
-      <button type="button" class="sh-filter-btn" id="shop-filter-btn" aria-label="تصفية المنتجات">
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/><circle cx="9" cy="7" r="2" fill="currentColor" stroke="none"/><circle cx="15" cy="12" r="2" fill="currentColor" stroke="none"/><circle cx="7" cy="17" r="2" fill="currentColor" stroke="none"/></svg><span class="sh-filter-lbl">فلترة</span><span class="sh-filter-count" id="shop-filter-count" hidden></span>
-      </button>
-    </div>
     <div class="sh-suggest" id="shop-suggest" hidden role="listbox" aria-label="اقتراحات البحث"></div>
+  </header>
+
+  <main class="shop-main">
     <div class="sh-row sh-row-chips">
       <div class="sh-chips" id="shop-chips" role="tablist" aria-label="الأقسام"></div>
     </div>
     <div class="sh-active-filters" id="shop-active-filters" hidden></div>
-  </header>
-
-  <main class="shop-main">
     <section class="shop-intro" id="shop-intro"></section>
     <div class="shop-results-bar" id="shop-results-bar">
       <div class="sr-count" id="shop-result-count" aria-live="polite"></div>
