@@ -4315,6 +4315,10 @@ body.shop-mode {
 }
 #shop-view { width: 100%; max-width: 100vw; }
 .shop-header, .shop-main { width: 100%; }
+.ocean-connection-bar { position:sticky; top:0; z-index:120; display:flex; align-items:center; justify-content:center; gap:10px; min-height:38px; padding:7px 14px; background:#fff5cf; color:#684d00; font:700 13px/1.4 inherit; box-shadow:0 2px 8px rgba(0,0,0,.08); }
+.ocean-connection-bar[hidden] { display:none !important; }
+.ocean-connection-bar.is-offline,.ocean-connection-bar.is-error { background:#fff0f0; color:#8b1f28; }
+.ocean-connection-bar button { border:1px solid currentColor; border-radius:999px; background:transparent; color:inherit; padding:5px 10px; font:inherit; cursor:pointer; min-height:30px; }
 body.shop-mode .toolbar,
 body.shop-mode .section-nav,
 body.shop-mode #magazine { display: none !important; }
@@ -4918,160 +4922,6 @@ html.boot-shop #shop-view[hidden] { display: block !important; }
 }
 @keyframes skShimmer { from { background-position: 200% 0; } to { background-position: -20% 0; } }
 
-/* ── P0: connection status bar (non-intrusive, bottom-centered) ── */
-#net-status-bar{
-  position:fixed; left:50%; transform:translateX(-50%);
-  bottom:calc(env(safe-area-inset-bottom,0px) + 84px);
-  z-index:9400; display:flex; align-items:center; gap:10px;
-  max-width:min(92vw,460px); padding:9px 14px; border-radius:999px;
-  font-family:'IBM Plex Sans Arabic','Cairo',sans-serif; font-size:13px; font-weight:600;
-  line-height:1.5; direction:rtl; box-shadow:0 6px 22px rgba(10,42,77,.18);
-  background:#0E3D6E; color:#fff; border:1px solid rgba(255,255,255,.18);
-  opacity:.97; pointer-events:auto;
-  animation:nsbIn .22s ease-out;
-}
-#net-status-bar[hidden]{display:none!important;}
-#net-status-bar.nsb-ok{background:#0F7A4A;}
-#net-status-bar.nsb-warn{background:#8A5A00;}
-#net-status-bar.nsb-error{background:#9B2C2C;}
-#net-status-bar.nsb-offline{background:#4A4A4A;}
-#net-status-bar .nsb-msg{flex:1 1 auto;}
-#net-status-bar .nsb-retry{
-  flex:0 0 auto; border:0; cursor:pointer; border-radius:999px;
-  padding:5px 12px; font:inherit; font-size:12px; font-weight:700;
-  background:rgba(255,255,255,.92); color:#0E3D6E;
-}
-#net-status-bar .nsb-retry[hidden]{display:none;}
-#net-status-bar .nsb-retry:disabled{opacity:.6; cursor:default;}
-@keyframes nsbIn{from{opacity:0;transform:translateX(-50%) translateY(8px);}to{opacity:.97;transform:translateX(-50%) translateY(0);}}
-@media (prefers-reduced-motion:reduce){#net-status-bar{animation:none;}}
-@media print{#net-status-bar{display:none!important;}}
-
-/* ══════════════════════════════════════════════════════════════
-   COMPACT MOBILE HEADER — more room for products
-   Trims vertical padding + control heights on phones only.
-   Colors, fonts, order and structure are unchanged.
-   Tap targets stay >= 40px (WCAG-safe).
-   ══════════════════════════════════════════════════════════════ */
-@media (max-width: 768px) {
-  .shop-header { padding: 6px 12px 0; }
-
-  /* Row 1: brand + actions */
-  .sh-row-brand { padding-bottom: 4px; }
-  .sh-btn { min-height: 40px; min-width: 40px; padding: 0 10px; border-radius: 11px; }
-  .sh-brand { font-size: 15.5px; gap: 8px; }
-  .sh-brand .ring { width: 28px; height: 28px; font-size: 13.5px; }
-  .sh-cart-count { min-width: 18px; height: 18px; font-size: 10.5px; }
-
-  /* Row 2: search + filter */
-  .sh-row-search { padding-bottom: 6px; }
-  .sh-search { height: 42px; font-size: 15.5px; border-radius: 12px;
-               padding-inline-start: 36px; padding-inline-end: 36px; }
-  .sh-search-icn { inset-inline-start: 11px; font-size: 14px; }
-  .sh-search-clear { width: 30px; height: 30px; }
-  .sh-filter-btn { height: 42px; padding: 0 12px; border-radius: 12px; font-size: 14px; gap: 6px;
-                   box-shadow: 0 5px 12px rgba(31,132,56,.3); }
-  .sh-filter-count { min-width: 18px; height: 18px; font-size: 11px; }
-
-  /* Row 3: category chips */
-  .sh-row-chips { padding-bottom: 6px; }
-  .sh-chip { min-height: 34px; padding: 0 13px; font-size: 13.5px; }
-
-  /* Row 4: active filter chips */
-  .sh-active-filters { gap: 6px; padding: 0 0 6px; }
-  .af-chip { min-height: 30px; font-size: 12px; padding: 0 5px 0 10px; gap: 6px; }
-  .af-chip .af-x { width: 22px; height: 22px; font-size: 11px; }
-  .af-clear-all { min-height: 30px; font-size: 12px; }
-
-  /* Give the grid the reclaimed space */
-  .shop-main { padding: 10px 12px 120px; }
-}
-
-/* ══════════════════════════════════════════════════════════════
-   ULTRA-COMPACT HEADER (phones) — pass 2
-   Collapses 4 stacked rows into 2 using flex ordering only.
-   No markup changes, no JS changes: every control keeps its id,
-   its listener and its behaviour. Purely visual re-flow.
-   ══════════════════════════════════════════════════════════════ */
-@media (max-width: 768px) {
-  /* The header becomes a wrapping flex row so brand+search share line 1 */
-  .shop-header {
-    display: flex; flex-wrap: wrap; align-items: center;
-    gap: 0 8px; padding: 5px 12px 0;
-  }
-
-  /* Line 1: logo (compact) — sits beside the search field */
-  .sh-row-brand {
-    order: 1; flex: 0 0 auto; width: auto;
-    padding-bottom: 0; gap: 6px; justify-content: flex-start;
-  }
-  .sh-row-search {
-    order: 2; flex: 1 1 auto;
-    /* Guard: if the line ever gets too tight the search wraps to its own
-       line instead of being crushed. Behaviour degrades gracefully. */
-    min-width: 190px;
-    padding-bottom: 5px; gap: 7px;
-  }
-
-  /* Logo shrinks to a mark; the cart/menu move to the end of line 1 */
-  .sh-brand { font-size: 0; gap: 0; }
-  .sh-brand .ocean-logo { transform: scale(.82); transform-origin: center; }
-  /* .sh-actions stays a real flex container (display:contents has
-     known VoiceOver/Safari bugs) — it just gets tighter spacing. */
-  .sh-actions { gap: 6px; }
-
-  /* Controls: tighter but still >=38px touch targets */
-  .sh-btn { min-height: 38px; min-width: 38px; padding: 0 9px; border-radius: 10px; }
-  .sh-search { height: 38px; font-size: 15px; border-radius: 11px;
-               padding-inline-start: 34px; padding-inline-end: 34px; }
-  .sh-search-icn { inset-inline-start: 10px; font-size: 13px; }
-  .sh-search-clear { width: 28px; height: 28px; }
-  .sh-filter-btn { height: 38px; padding: 0 11px; border-radius: 11px; font-size: 13.5px; gap: 5px;
-                   box-shadow: 0 4px 10px rgba(31,132,56,.28); }
-  .sh-filter-count { min-width: 17px; height: 17px; font-size: 10.5px; }
-  .sh-cart-count { min-width: 17px; height: 17px; font-size: 10px; top: 0; }
-
-  /* Line 2: category chips AND active filters share one scroll row */
-  .sh-row-chips { order: 4; flex: 1 1 100%; padding-bottom: 5px; }
-  .sh-chip { min-height: 32px; padding: 0 12px; font-size: 13px; }
-
-  .sh-active-filters {
-    order: 5; flex: 1 1 100%;
-    flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none;
-    gap: 6px; padding: 0 0 5px;
-  }
-  .sh-active-filters::-webkit-scrollbar { display: none; }
-  .sh-active-filters > * { flex: 0 0 auto; }
-  .af-chip { min-height: 28px; font-size: 11.5px; padding: 0 4px 0 9px; gap: 5px; }
-  .af-chip .af-x { width: 20px; height: 20px; font-size: 10.5px; }
-  .af-clear-all { min-height: 28px; font-size: 11.5px; }
-
-  /* Suggestions must anchor under the (now shorter) search field */
-  .sh-suggest { order: 6; inset-inline: 12px; }
-
-  .shop-main { padding: 8px 12px 120px; }
-}
-
-/* Very small phones (<=380px) */
-@media (max-width: 380px) {
-  .shop-header { padding-inline: 10px; gap: 0 6px; }
-  .sh-brand .ocean-logo { transform: scale(.74); }
-  .sh-search { height: 36px; font-size: 14.5px; }
-  .sh-filter-btn { height: 36px; padding: 0 9px; }
-  .sh-filter-lbl { display: none; }   /* icon-only filter button, keeps count badge */
-  .sh-btn { min-height: 36px; min-width: 36px; padding: 0 7px; }
-  .sh-chip { min-height: 30px; padding: 0 10px; font-size: 12.5px; }
-}
-
-/* Landscape phones: header must never eat the short viewport */
-@media (max-width: 900px) and (orientation: landscape) {
-  .shop-header { padding-top: 3px; }
-  .sh-row-brand { padding-bottom: 0; }
-  .sh-row-search { padding-bottom: 3px; }
-  .sh-row-chips { padding-bottom: 3px; }
-  .sh-active-filters { padding-bottom: 3px; }
-}
-
 </style>
 </head>
 <body>
@@ -5205,177 +5055,81 @@ const SETTINGS_API_URL  = `https://opensheet.elk.sh/${SHEET_ID}/Magazine_Setting
 const SHOP_ONLY_MODE    = true;
 window.SHOP_ONLY_MODE   = SHOP_ONLY_MODE;
 
-/* ================================================================
-   P0 RESILIENCE CORE — Fetch Engine · Cache · Net Status
-   ================================================================ */
-const NET_CFG = { TIMEOUT: 9000, RETRIES: 2, BACKOFF: [800, 2000] };
+/* Reliable data layer: bounded requests, retry/backoff and last-good cache. */
+const OCEAN_CACHE_VERSION = 1;
+const OCEAN_CACHE_PREFIX = "ocean-storefront-v" + OCEAN_CACHE_VERSION + ":";
+let OCEAN_LOAD_SEQUENCE = 0;
 
-/* ── Network Information API helpers ── */
-function netInfo() {
-  try { return navigator.connection || navigator.mozConnection || navigator.webkitConnection || null; }
-  catch (e) { return null; }
+function oceanCacheRead(key) {
+  try {
+    const saved = JSON.parse(localStorage.getItem(OCEAN_CACHE_PREFIX + key) || "null");
+    return saved && Array.isArray(saved.data) ? saved : null;
+  } catch (_) { return null; }
 }
-function isSlowNetwork() {
-  const c = netInfo();
-  if (!c) return false;
-  if (c.saveData === true) return true;
-  const t = String(c.effectiveType || "");
-  return t === "2g" || t === "slow-2g";
+function oceanCacheWrite(key, data) {
+  try {
+    localStorage.setItem(OCEAN_CACHE_PREFIX + key, JSON.stringify({ timestamp: Date.now(), data: data }));
+  } catch (_) { /* Storage may be unavailable/private/full; live data still works. */ }
 }
-window.isSlowNetwork = isSlowNetwork;
-
-/* ── Unified Fetch Engine: AbortController + timeout + retry + JSON validation ── */
-async function fetchJSON(url, opts) {
-  opts = opts || {};
-  const label   = opts.label || url;
-  const timeout = opts.timeout || NET_CFG.TIMEOUT;
-  const retries = (opts.retries === undefined) ? NET_CFG.RETRIES : opts.retries;
-  const backoff = opts.backoff || NET_CFG.BACKOFF;
-  let lastErr = null;
-
+function oceanDelay(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
+async function oceanFetchJson(url, options) {
+  options = options || {};
+  const timeoutMs = options.timeoutMs || 9000;
+  const retries = options.retries == null ? 2 : options.retries;
+  let lastError;
   for (let attempt = 0; attempt <= retries; attempt++) {
-    if (attempt > 0) {
-      const wait = backoff[Math.min(attempt - 1, backoff.length - 1)];
-      console.warn("[fetch] retry " + attempt + "/" + retries + " for " + label + " in " + wait + "ms");
-      await new Promise(r => setTimeout(r, wait));
-    }
-    const ctrl = new AbortController();
-    let timer = setTimeout(() => { try { ctrl.abort(); } catch (e) {} }, timeout);
+    const controller = typeof AbortController !== "undefined" ? new AbortController() : null;
+    const timer = controller ? setTimeout(() => controller.abort(), timeoutMs) : null;
     try {
-      if (opts.signal) {
-        if (opts.signal.aborted) throw new Error("aborted-by-caller");
-        opts.signal.addEventListener("abort", () => { try { ctrl.abort(); } catch (e) {} }, { once: true });
-      }
-      const res = await fetch(url, { signal: ctrl.signal, cache: "no-store" });
-      clearTimeout(timer); timer = null;
-      if (!res.ok) throw new Error("HTTP " + res.status);
-      const text = await res.text();
-      if (!text || !text.trim()) throw new Error("empty response body");
-      let data;
-      try { data = JSON.parse(text); }
-      catch (pe) { throw new Error("invalid JSON: " + pe.message); }
-      if (data == null) throw new Error("null JSON payload");
-      if (opts.expectArray !== false && !Array.isArray(data)) throw new Error("expected array payload");
-      console.log("[fetch] ok " + label + " (" + (Array.isArray(data) ? data.length + " rows" : "object") + ")");
-      return data;
-    } catch (err) {
+      const response = await fetch(url, { signal: controller ? controller.signal : undefined, cache: "no-cache" });
+      if (!response.ok) throw new Error("HTTP " + response.status);
+      const data = await response.json();
+      if (!Array.isArray(data)) throw new Error("Invalid JSON payload");
       if (timer) clearTimeout(timer);
-      lastErr = (err && err.name === "AbortError") ? new Error("timeout after " + timeout + "ms") : err;
-      console.warn("[fetch] fail " + label + " attempt " + (attempt + 1) + ": " + lastErr.message);
-      if (opts.signal && opts.signal.aborted) break;
+      return data;
+    } catch (error) {
+      if (timer) clearTimeout(timer);
+      lastError = error;
+      if (attempt < retries) await oceanDelay(450 * Math.pow(2, attempt));
     }
   }
-  throw lastErr || new Error("fetch failed: " + label);
+  throw lastError || new Error("Network request failed");
 }
-window.fetchJSON = fetchJSON;
-
-/* ── Cache layer (localStorage; guarded, versioned) ── */
-const CACHE_KEY     = "ocean_cache_v1";
-const CACHE_SCHEMA  = 1;
-const CACHE_FRESH_MS= 24 * 60 * 60 * 1000;
-
-function cacheRead() {
+async function oceanLoadDataset(key, url) {
   try {
-    const raw = localStorage.getItem(CACHE_KEY);
-    if (!raw) return null;
-    const o = JSON.parse(raw);
-    if (!o || o.schema !== CACHE_SCHEMA) { console.warn("[cache] schema mismatch — ignoring"); return null; }
-    if (!Array.isArray(o.products) || !o.products.length) return null;
-    o.ageMs = Date.now() - (Number(o.savedAt) || 0);
-    o.stale = o.ageMs > CACHE_FRESH_MS;
-    return o;
-  } catch (e) { console.warn("[cache] read failed:", e.message); return null; }
-}
-/* Never overwrite a good snapshot with empty/corrupt data. */
-function cacheWrite(patch) {
-  try {
-    const prev = (function () {
-      try { const r = localStorage.getItem(CACHE_KEY); return r ? JSON.parse(r) : null; } catch (e) { return null; }
-    })() || {};
-    const next = {
-      schema:   CACHE_SCHEMA,
-      products: (Array.isArray(patch.products) && patch.products.length) ? patch.products : (prev.products || []),
-      categories: (patch.categories && Object.keys(patch.categories).length) ? patch.categories : (prev.categories || null),
-      orderedCats: (Array.isArray(patch.orderedCats) && patch.orderedCats.length) ? patch.orderedCats : (prev.orderedCats || []),
-      settings: (patch.settings && Object.keys(patch.settings).length) ? patch.settings : (prev.settings || null),
-      savedAt:  Date.now()
-    };
-    if (!next.products.length) { console.warn("[cache] refusing to write empty products"); return false; }
-    localStorage.setItem(CACHE_KEY, JSON.stringify(next));
-    console.log("[cache] saved " + next.products.length + " products");
-    return true;
-  } catch (e) {
-    console.warn("[cache] write failed (quota?):", e.message);
-    return false;
+    const data = await oceanFetchJson(url);
+    oceanCacheWrite(key, data);
+    return { data: data, source: "network" };
+  } catch (error) {
+    const cached = oceanCacheRead(key);
+    if (cached) return { data: cached.data, source: "cache", timestamp: cached.timestamp, error: error };
+    throw error;
   }
 }
-window.cacheRead = cacheRead; window.cacheWrite = cacheWrite;
-
-/* ── Non-blocking connection status bar ── */
-let _statusHideTimer = null;
-function ensureNetBar() {
-  let bar = document.getElementById("net-status-bar");
-  if (bar) return bar;
-  if (!document.body) return null;
-  bar = document.createElement("div");
-  bar.id = "net-status-bar";
-  bar.setAttribute("role", "status");
-  bar.setAttribute("aria-live", "polite");
-  bar.hidden = true;
-  bar.innerHTML = '<span class="nsb-msg"></span><button type="button" class="nsb-retry" hidden>إعادة المحاولة</button>';
-  document.body.appendChild(bar);
-  const rb = bar.querySelector(".nsb-retry");
-  if (rb && !rb._wired) {
-    rb._wired = true;
-    rb.addEventListener("click", function () {
-      rb.disabled = true;
-      setNetStatus("جارٍ تحديث العروض…", "loading");
-      Promise.resolve(loadMagazine({ force: true })).catch(function () {})
-        .then(function () { rb.disabled = false; });
-    });
+function oceanSetConnectionState(state, detail) {
+  let bar = document.getElementById("ocean-connection-bar");
+  if (!bar) {
+    bar = document.createElement("div");
+    bar.id = "ocean-connection-bar";
+    bar.setAttribute("role", "status");
+    bar.setAttribute("aria-live", "polite");
+    const host = document.getElementById("shop-header") || document.body;
+    host.insertAdjacentElement(host === document.body ? "afterbegin" : "afterend", bar);
   }
-  return bar;
+  const labels = {
+    loading: "جاري تحديث العروض…",
+    cached: "الاتصال ضعيف — نعرض آخر نسخة محفوظة",
+    offline: "أنت غير متصل بالإنترنت — يمكنك تصفح العروض المحفوظة",
+    error: "تعذر تحديث العروض"
+  };
+  bar.className = "ocean-connection-bar is-" + state;
+  bar.hidden = state === "online";
+  bar.innerHTML = '<span>' + escapeHtml(detail || labels[state] || "") + '</span>' +
+    ((state === "cached" || state === "offline" || state === "error")
+      ? '<button type="button" id="ocean-network-retry">إعادة المحاولة</button>' : '');
+  const retry = document.getElementById("ocean-network-retry");
+  if (retry) retry.onclick = function () { loadMagazine({ force: true }); };
 }
-/* kind: loading | ok | warn | error | offline */
-function setNetStatus(msg, kind) {
-  const bar = ensureNetBar();
-  if (!bar) return;
-  if (_statusHideTimer) { clearTimeout(_statusHideTimer); _statusHideTimer = null; }
-  if (!msg) { bar.hidden = true; return; }
-  bar.hidden = false;
-  bar.className = "nsb-" + (kind || "loading");
-  const m = bar.querySelector(".nsb-msg"); if (m) m.textContent = msg;
-  const rb = bar.querySelector(".nsb-retry");
-  if (rb) rb.hidden = !(kind === "error" || kind === "offline");
-  if (kind === "ok") _statusHideTimer = setTimeout(function () { bar.hidden = true; }, 2600);
-}
-window.setNetStatus = setNetStatus;
-
-/* online/offline events are hints only — never the sole source of truth */
-(function wireNetEvents() {
-  if (window._netEventsWired) return;
-  window._netEventsWired = true;
-  window.addEventListener("offline", function () { setNetStatus("لا يوجد اتصال بالإنترنت", "offline"); });
-  window.addEventListener("online", function () {
-    setNetStatus("جارٍ تحديث العروض…", "loading");
-    Promise.resolve(loadMagazine({ force: true })).catch(function () {});
-  });
-})();
-
-/* ── Safe de-duplication by item_code (runs before search index) ── */
-function dedupeProducts(list) {
-  if (!Array.isArray(list)) return [];
-  const seen = new Map(); const out = []; let removed = 0;
-  list.forEach(function (p) {
-    const code = String((p && (p.item_code || p.sku || p.code)) || "").trim();
-    if (!code) { out.push(p); return; }            // never merge blank codes
-    if (seen.has(code)) { removed++; return; }
-    seen.set(code, true); out.push(p);
-  });
-  if (removed > 0) console.warn("[dedupe] removed " + removed + " duplicate item_code row(s); " + out.length + " unique remain");
-  return out;
-}
-window.dedupeProducts = dedupeProducts;
 
 /* ================================================================
    MAGAZINE SETTINGS — كل النصوص تيجي من الشيت فقط
@@ -5388,25 +5142,22 @@ function getSetting(key) {
   return (v !== undefined && v !== null) ? String(v) : "";
 }
 
-/* Applies a settings map into MAGAZINE_SETTINGS (used by both network + cache paths) */
-function applySettingsMap(map) {
-  if (!map || typeof map !== "object") return 0;
-  Object.keys(map).forEach(k => { MAGAZINE_SETTINGS[k] = map[k]; });
-  window.MAGAZINE_SETTINGS = MAGAZINE_SETTINGS;
-  return Object.keys(map).length;
-}
-
-/* Fetches settings and RETURNS the map — throws on failure so allSettled can see it. */
-async function loadMagazineSettings(opts) {
-  const rows = await fetchJSON(SETTINGS_API_URL, Object.assign({ label: "Magazine_Settings" }, opts || {}));
-  const map = {};
-  rows.forEach(row => {
-    const key   = String(row.key   || "").trim();
-    const value = String(row.value || "").trim();
-    if (key) map[key] = value;   // خزّن حتى لو فاضية
-  });
-  console.log("[Settings] Loaded", Object.keys(map).length, "keys from Magazine_Settings");
-  return map;
+async function loadMagazineSettings(dataset) {
+  try {
+    const result = dataset || await oceanLoadDataset("settings", SETTINGS_API_URL);
+    const rows = result.data;
+    MAGAZINE_SETTINGS = {};
+    rows.forEach(row => {
+      const key   = String(row.key   || "").trim();
+      const value = String(row.value || "").trim();
+      if (key) MAGAZINE_SETTINGS[key] = value;   // خزّن حتى لو فاضية
+    });
+    console.log("[Settings] Loaded", Object.keys(MAGAZINE_SETTINGS).length, "keys from", result.source);
+    return result;
+  } catch (err) {
+    console.warn("[Settings] Sheet not loaded —", err.message);
+    return null;
+  }
 }
 
 // Pagination constants — sized so pages NEVER overflow the fixed 1240×1754 canvas.
@@ -5550,79 +5301,52 @@ function setStatus(text, kind) {
    LOAD CATEGORY DATA FROM SHEET
    ================================================================ */
 
-/* Parses Categories rows → {map, ordered}. Throws on network failure. */
-function parseCategoryRows(rows) {
-  const map = {};
-  const list = [];
-  (rows || []).forEach(row => {
-    // Use category_key if present, else auto-generate from English/Arabic name
-    let key = String(row.category_key||"").trim();
-    if (!key && row.category_name_en) key = String(row.category_name_en).trim();
-    if (!key && row.category_name_ar) key = String(row.category_name_ar).trim();
-    if (!key) return;
-    key = key.toLowerCase(); // normalize to lowercase for consistent matching
-    // Only skip if active column explicitly exists AND is FALSE
-    const activeVal = String(row.active||"").trim();
-    if (activeVal !== "" && !truthy(activeVal)) return;
-    const entry = {
-      key,
-      name_ar:     row.category_name_ar || key,
-      name_en:     row.category_name_en || key.toUpperCase(),
-      toc_image:   convertDriveUrl(row.toc_image   || ""),
-      hero_image:  convertDriveUrl(row.hero_image  || ""),
-      cover_image: convertDriveUrl(row.cover_image || row.hero_image || ""),
-      order:       parseInt(row.order,10)||99,
-      css_class:   row.css_class      || "",
-      accent:      row.accent_color   || DEFAULT_ACCENT,
-      accent_deep: row.accent_deep    || DEFAULT_ACCENT_DEEP,
-      bg:          row.background_color|| DEFAULT_BG,
-      show_if_empty: truthy(row.show_if_empty)
-    };
-    map[key] = entry;
-    list.push(entry);
-  });
-  return { map: map, ordered: list.sort((a,b) => a.order - b.order) };
-}
-
-/* Derives usable filter categories from the products themselves — used when
-   the Categories sheet fails so filtering still works. */
-function deriveCategoriesFromProducts(products) {
-  const map = {}; const list = [];
-  (products || []).forEach(p => {
-    const raw = String(p.category || p.category_key || "").trim();
-    if (!raw) return;
-    const key = raw.toLowerCase();
-    if (map[key]) return;
-    const entry = {
-      key,
-      name_ar:     String(p.category_ar || p.category_name_ar || raw).trim() || key,
-      name_en:     String(p.category_en || p.category_name_en || raw).trim() || key.toUpperCase(),
-      toc_image:"", hero_image:"", cover_image:"",
-      order: 99, css_class:"",
-      accent: DEFAULT_ACCENT, accent_deep: DEFAULT_ACCENT_DEEP, bg: DEFAULT_BG,
-      show_if_empty:false, derived:true
-    };
-    map[key] = entry; list.push(entry);
-  });
-  list.sort((a,b) => String(a.name_ar).localeCompare(String(b.name_ar), "ar"));
-  console.warn("[Categories] derived " + list.length + " category/ies from product data (sheet unavailable)");
-  return { map: map, ordered: list };
-}
-
-function applyCategoryData(parsed) {
-  CATEGORY_DATA = (parsed && parsed.map) || {};
-  ORDERED_CATS  = (parsed && parsed.ordered) || [];
-  window.CATEGORY_DATA = CATEGORY_DATA;
-  window.ORDERED_CATS  = ORDERED_CATS;
-  return ORDERED_CATS.length;
-}
-
-/* Fetches Categories via the unified engine. Throws so allSettled can branch. */
-async function loadCategoryData(opts) {
-  const rows = await fetchJSON(CATEGORIES_API_URL, Object.assign({ label: "Categories" }, opts || {}));
-  const parsed = parseCategoryRows(rows);
-  console.log("Categories loaded:", parsed.ordered.length);
-  return parsed;
+async function loadCategoryData(dataset) {
+  try {
+    const result = dataset || await oceanLoadDataset("categories", CATEGORIES_API_URL);
+    const rows = result.data;
+    CATEGORY_DATA = {};
+    const list = [];
+    rows.forEach(row => {
+      // Use category_key if present, else auto-generate from English/Arabic name
+      let key = String(row.category_key||"").trim();
+      if (!key && row.category_name_en) key = String(row.category_name_en).trim();
+      if (!key && row.category_name_ar) key = String(row.category_name_ar).trim();
+      if (!key) return;
+      key = key.toLowerCase(); // normalize to lowercase for consistent matching
+      // Only skip if active column explicitly exists AND is FALSE
+      const activeVal = String(row.active||"").trim();
+      if (activeVal !== "" && !truthy(activeVal)) return;
+      const entry = {
+        key,
+        name_ar:     row.category_name_ar || key,
+        name_en:     row.category_name_en || key.toUpperCase(),
+        toc_image:   convertDriveUrl(row.toc_image   || ""),
+        hero_image:  convertDriveUrl(row.hero_image  || ""),
+        cover_image: convertDriveUrl(row.cover_image || row.hero_image || ""),
+        order:       parseInt(row.order,10)||99,
+        css_class:   row.css_class      || "",
+        accent:      row.accent_color   || DEFAULT_ACCENT,
+        accent_deep: row.accent_deep    || DEFAULT_ACCENT_DEEP,
+        bg:          row.background_color|| DEFAULT_BG,
+        show_if_empty: truthy(row.show_if_empty)
+      };
+      CATEGORY_DATA[key] = entry;
+      list.push(entry);
+    });
+    ORDERED_CATS = list.sort((a,b) => a.order - b.order);
+    window.CATEGORY_DATA = CATEGORY_DATA;
+    window.ORDERED_CATS = ORDERED_CATS;
+    console.log("Categories loaded:", ORDERED_CATS.length);
+    return result;
+  } catch(err) {
+    console.warn("Categories API failed, using empty fallback:", err.message);
+    CATEGORY_DATA = {};
+    ORDERED_CATS = [];
+    window.CATEGORY_DATA = CATEGORY_DATA;
+    window.ORDERED_CATS = ORDERED_CATS;
+    return null;
+  }
 }
 
 /* ================================================================
@@ -6160,201 +5884,104 @@ function showStorefrontLoadError(message) {
   empty.innerHTML = `<div class="se-icn" aria-hidden="true">⚠️</div>
     <h3>تعذر تحميل العروض</h3>
     <p>${escapeHtml(message || "حدث خطأ أثناء تحميل المنتجات.")}</p>
-    <div class="se-actions"><button type="button" class="primary" id="sf-retry-btn">إعادة المحاولة</button></div>`;
-  var _rb = document.getElementById("sf-retry-btn");
-  if (_rb) _rb.addEventListener("click", function () {
-    _rb.disabled = true; _rb.textContent = "جارٍ التحميل…";
-    Promise.resolve(loadMagazine({ force: true })).catch(function(){})
-      .then(function(){ _rb.disabled = false; _rb.textContent = "إعادة المحاولة"; });
-  });
+    <div class="se-actions"><button type="button" class="primary" onclick="loadMagazine({force:true})">إعادة المحاولة</button></div>`;
 }
 
-/* ================================================================
-   P0 ORCHESTRATOR — cache-first paint, parallel network refresh
-   Generation token guarantees only the newest response wins.
-   ================================================================ */
-let _loadGeneration = 0;
-let _loadInFlight   = null;
-let _cachePainted   = false;
-let _lastGoodPaintAt = 0;
+async function loadMagazine(options) {
+  const loadSequence = ++OCEAN_LOAD_SEQUENCE;
+  const mount      = document.getElementById("categories-mount");
+  const finalMount = document.getElementById("final-page-mount");
+  if (!mount) return;
 
-function normalizeProductRows(rawProducts) {
-  return dedupeProducts(
-    (rawProducts || []).filter(r => r && Object.values(r).some(v => String(v||"").trim() !== "")
-                                      && (truthy(r.is_active) || truthy(r.active)))
-  ).map((row, idx) => enrichProduct({ ...row }, idx));
-}
+  /* Enterprise: skeleton cards instead of bare spinner */
+  if (!SHOP_ONLY_MODE) (function buildSkeleton() {
+    function skelCard() {
+      return '<div class="product-card skeleton-card" aria-hidden="true">' +
+        '<div class="skel-img"></div>' +
+        '<div class="skel-line wide"></div>' +
+        '<div class="skel-line mid"></div>' +
+        '<div class="skel-line short"></div>' +
+        '<div class="skel-price-row"><div class="skel-line price" style="flex:1"></div>' +
+        '<div class="skel-line mid"></div></div></div>';
+    }
+    var cards = Array.from({length:8}, skelCard).join("");
+    mount.innerHTML = '<div class="page-wrap"><section class="page" style="position:relative;overflow:visible;height:auto;transform:none;width:100%">' +
+      '<div class="page-pad" style="position:relative;inset:auto;padding:20px 16px 16px;">' +
+      '<div class="grid-4" role="status" aria-busy="true" aria-label="جاري تحميل المنتجات">' + cards + '</div></div></section></div>';
+  })();
+  setStatus("جاري التحميل…","");
+  oceanSetConnectionState(navigator.onLine === false ? "offline" : "loading");
 
-/* Publishes products into global state and repaints the storefront
-   WITHOUT touching scroll position or rebuilding mounted cards. */
-function publishProducts(products, opts) {
-  opts = opts || {};
+  // Products, categories and settings start together. Optional sheets never
+  // delay the product grid, and an older request cannot overwrite a newer one.
+  const [prodResult, catResult, settingsResult] = await Promise.allSettled([
+    oceanLoadDataset("products", PRODUCTS_API_URL),
+    oceanLoadDataset("categories", CATEGORIES_API_URL),
+    oceanLoadDataset("settings", SETTINGS_API_URL)
+  ]);
+  if (loadSequence !== OCEAN_LOAD_SEQUENCE) return;
+  if (catResult.status === "fulfilled") await loadCategoryData(catResult.value);
+  if (settingsResult.status === "fulfilled") {
+    await loadMagazineSettings(settingsResult.value);
+    if (typeof renderCoverAndStaticSections === "function") renderCoverAndStaticSections();
+  }
+
+  // Magazine artwork is not built in the single storefront experience.
+  if (!SHOP_ONLY_MODE) updateCoverImage();
+
+  if (prodResult.status === "rejected") {
+    setStatus("تعذّر التحميل","error");
+    oceanSetConnectionState(navigator.onLine === false ? "offline" : "error");
+    if (!SHOP_ONLY_MODE) mount.innerHTML = renderErrorPage("تعذر تحميل العروض حاليًا. يرجى المحاولة لاحقًا.");
+    else showStorefrontLoadError("تعذر تحميل العروض حاليًا. يرجى المحاولة لاحقًا.");
+    if (finalMount) { finalMount.innerHTML = renderFinalPage(buildFinalPageSettings()); applyPageScale(); }
+    return;
+  }
+
+  const rawProducts = prodResult.value.data;
+  const seenProductCodes = new Set();
+  const products = rawProducts
+    .filter(r => r && Object.values(r).some(v=>String(v||"").trim()!=="") && (truthy(r.is_active)||truthy(r.active)))
+    .filter(r => {
+      const code = String(r.item_code || r.sku || r.code || "").trim();
+      if (!code) return true;
+      if (seenProductCodes.has(code)) return false;
+      seenProductCodes.add(code);
+      return true;
+    })
+    .map((row, idx) => enrichProduct({...row}, idx));
+
+  if (!products.length) {
+    setStatus("لا توجد منتجات فعّالة","error");
+    if (!SHOP_ONLY_MODE) mount.innerHTML = renderErrorPage("لم يتم العثور على أي منتج فعّال. تأكد أن العمود active مضبوط على TRUE.");
+    else showStorefrontLoadError("لا توجد منتجات متاحة حاليًا.");
+    if (finalMount) { finalMount.innerHTML = renderFinalPage(buildFinalPageSettings()); applyPageScale(); }
+    return;
+  }
+
   ALL_PRODUCTS = products;
   window.ALL_PRODUCTS = ALL_PRODUCTS;
 
   if (!SHOP_ONLY_MODE) {
+    // Legacy magazine render path kept dormant for data compatibility only.
     renderTocGrid();
     populateCategoryFilter();
     renderCategoriesMount();
-    const fm = document.getElementById("final-page-mount");
-    if (fm) fm.innerHTML = renderFinalPage(buildFinalPageSettings());
+    if (finalMount) { finalMount.innerHTML = renderFinalPage(buildFinalPageSettings()); }
     applyPageScale();
   } else {
-    const mount = document.getElementById("categories-mount");
-    if (mount && mount.innerHTML !== "") mount.innerHTML = "";
+    mount.innerHTML = "";
   }
 
   const now = new Date().toLocaleTimeString("ar-EG",{hour:"2-digit",minute:"2-digit"});
-  setStatus(products.length + " منتج · " + now, "ok");
+  setStatus(products.length+" منتج · "+now,"ok");
+  const usedCache = prodResult.value.source === "cache" ||
+    (catResult.status === "fulfilled" && catResult.value.source === "cache") ||
+    (settingsResult.status === "fulfilled" && settingsResult.value.source === "cache");
+  oceanSetConnectionState(usedCache ? (navigator.onLine === false ? "offline" : "cached") : "online");
 
-  /* Rebuild the shop view in place. bootShopFromData preserves scroll because
-     renderShopResults only replaces #shop-grid contents, and the cart is held
-     in the CART Map (never rebuilt from products). */
-  if (typeof window.bootShopFromData === "function") {
-    const y = window.scrollY || 0;
-    window.bootShopFromData();
-    if (Math.abs((window.scrollY || 0) - y) > 2) { try { window.scrollTo(0, y); } catch (e) {} }
-  }
+  /* Enterprise: update result count + value classes after full load */
   if (typeof upsertResultCount === "function") upsertResultCount();
-  _lastGoodPaintAt = Date.now();
-}
-
-async function loadMagazine(options) {
-  options = options || {};
-  const mount = document.getElementById("categories-mount");
-  if (!mount) return;
-
-  /* Single-flight: a second call joins the first instead of racing it. */
-  if (_loadInFlight && !options.force) return _loadInFlight;
-  const gen = ++_loadGeneration;
-  const isCurrent = () => gen === _loadGeneration;
-
-  const run = (async function () {
-    /* ── Step 1: paint cached snapshot immediately (no skeleton flash) ── */
-    let hadCache = false;
-    if (!_cachePainted) {
-      const snap = cacheRead();
-      if (snap && snap.products.length) {
-        hadCache = true; _cachePainted = true;
-        try {
-          if (snap.settings) applySettingsMap(snap.settings);
-          if (snap.categories) applyCategoryData({ map: snap.categories, ordered: snap.orderedCats || [] });
-          publishProducts(snap.products.map((row, i) => enrichProduct({ ...row }, i)));
-          console.log("[boot] painted " + snap.products.length + " products from cache (age " +
-                      Math.round(snap.ageMs/1000) + "s" + (snap.stale ? ", stale" : "") + ")");
-          if (snap.stale) setNetStatus("نعرض آخر بيانات محفوظة — جارٍ التحديث…", "warn");
-          else setNetStatus("جارٍ تحديث العروض…", "loading");
-        } catch (e) { console.warn("[boot] cache paint failed:", e.message); hadCache = false; }
-      }
-    } else { hadCache = true; }
-
-    if (!hadCache) {
-      /* No cache: show skeleton (magazine path) / loading status only. */
-      if (!SHOP_ONLY_MODE) (function buildSkeleton() {
-        function skelCard() {
-          return '<div class="product-card skeleton-card" aria-hidden="true">' +
-            '<div class="skel-img"></div><div class="skel-line wide"></div>' +
-            '<div class="skel-line mid"></div><div class="skel-line short"></div>' +
-            '<div class="skel-price-row"><div class="skel-line price" style="flex:1"></div>' +
-            '<div class="skel-line mid"></div></div></div>';
-        }
-        var cards = Array.from({length:8}, skelCard).join("");
-        mount.innerHTML = '<div class="page-wrap"><section class="page" style="position:relative;overflow:visible;height:auto;transform:none;width:100%">' +
-          '<div class="page-pad" style="position:relative;inset:auto;padding:20px 16px 16px;">' +
-          '<div class="grid-4" role="status" aria-busy="true" aria-label="جاري تحميل المنتجات">' + cards + '</div></div></section></div>';
-      })();
-      setStatus("جاري التحميل…","");
-      setNetStatus(navigator.onLine === false ? "لا يوجد اتصال بالإنترنت" : "جارٍ تحديث العروض…",
-                   navigator.onLine === false ? "offline" : "loading");
-    }
-
-    /* ── Step 2: fetch Products / Categories / Settings fully in parallel ── */
-    const [prodR, catR, setR] = await Promise.allSettled([
-      fetchJSON(PRODUCTS_API_URL, { label: "Products" }),
-      loadCategoryData(),
-      loadMagazineSettings()
-    ]);
-
-    if (!isCurrent()) { console.log("[load] gen " + gen + " superseded — discarding"); return; }
-
-    /* ── Settings: independent of products ── */
-    let settingsMap = null;
-    if (setR.status === "fulfilled") {
-      settingsMap = setR.value;
-      applySettingsMap(settingsMap);
-      try { if (typeof renderCoverAndStaticSections === "function") renderCoverAndStaticSections(); } catch (e) {}
-    } else {
-      console.warn("[Settings] unavailable — using defaults:", setR.reason && setR.reason.message);
-    }
-
-    /* ── Products ── */
-    let products = null;
-    if (prodR.status === "fulfilled") {
-      products = normalizeProductRows(prodR.value);
-      if (!products.length) {
-        console.warn("[Products] sheet returned 0 active rows — keeping existing data");
-        products = null;
-      }
-    }
-
-    if (!products) {
-      /* Network products failed. Keep whatever is on screen; never blank it. */
-      const msg = prodR.status === "rejected" ? (prodR.reason && prodR.reason.message) : "no active rows";
-      console.warn("[Products] load failed:", msg);
-      if (hadCache || (window.ALL_PRODUCTS || []).length) {
-        setNetStatus(navigator.onLine === false
-          ? "لا يوجد اتصال — نعرض آخر بيانات محفوظة"
-          : "الاتصال ضعيف — نعرض آخر بيانات محفوظة", navigator.onLine === false ? "offline" : "warn");
-      } else {
-        setStatus("تعذّر التحميل","error");
-        setNetStatus(navigator.onLine === false ? "لا يوجد اتصال بالإنترنت" : "تعذر تحميل العروض", 
-                     navigator.onLine === false ? "offline" : "error");
-        if (!SHOP_ONLY_MODE) mount.innerHTML = renderErrorPage("تعذر تحميل العروض حاليًا. يرجى المحاولة لاحقًا.");
-        else showStorefrontLoadError("تعذر تحميل العروض حاليًا. تحقق من الاتصال ثم أعد المحاولة.");
-      }
-      return;
-    }
-
-    /* ── Categories: sheet, else derive from the products we just got ── */
-    let parsedCats;
-    if (catR.status === "fulfilled" && catR.value && catR.value.ordered.length) {
-      parsedCats = catR.value;
-    } else {
-      console.warn("[Categories] unavailable — deriving from products:",
-                   catR.status === "rejected" ? (catR.reason && catR.reason.message) : "empty sheet");
-      parsedCats = deriveCategoriesFromProducts(products);
-    }
-    applyCategoryData(parsedCats);
-
-    if (!isCurrent()) return;
-
-    if (!SHOP_ONLY_MODE) updateCoverImage();
-    publishProducts(products);
-
-    /* ── Step 3: persist the successful snapshot ── */
-    cacheWrite({
-      products: products,
-      categories: parsedCats.map,
-      orderedCats: parsedCats.ordered,
-      settings: settingsMap
-    });
-    _cachePainted = true;
-
-    /* ── Step 4: status message ── */
-    const partial = (setR.status === "rejected") || (catR.status === "rejected");
-    setNetStatus(partial ? "تم تحديث العروض (بيانات جزئية)" : "تم تحديث العروض", "ok");
-
-    /* ── Step 5: idle-time branch prefetch only on healthy networks ── */
-    scheduleIdleBranchPrefetch();
-  })();
-
-  _loadInFlight = run.catch(function (e) {
-    console.warn("[load] unexpected error:", e && e.message);
-    setNetStatus("تعذر تحميل العروض", "error");
-  }).then(function () {
-    if (gen === _loadGeneration) _loadInFlight = null;
-  });
-  return _loadInFlight;
 }
 
 /* ================================================================
@@ -6372,10 +5999,7 @@ function wireToolbar() {
     timer = setTimeout(() => { CURRENT_FILTER.search = search.value; renderCategoriesMount(); }, 220);
   });
   if (filter) filter.addEventListener("change", () => { CURRENT_FILTER.category = filter.value; renderCategoriesMount(); });
-  if (refresh && !refresh._wired) {
-    refresh._wired = true;   /* guard against duplicate listeners */
-    refresh.addEventListener("click", () => { Promise.resolve(loadMagazine({ force: true })).catch(() => {}); });
-  }
+  if (refresh) refresh.addEventListener("click", () => loadMagazine());
   /* PDF export: real per-page PDF (html2canvas + jsPDF). Ctrl+P / browser print
      still works via the existing @media print styles. */
   if (print)   print.addEventListener("click",   () => exportMagazinePDF());
@@ -6588,19 +6212,9 @@ piObserver.observe(document.body, { childList: true, subtree: true });
    ================================================================ */
 
 /* ── Constants (resolved from Magazine_Settings sheet only) ── */
-/* These MUST be read lazily: this script runs before Magazine_Settings
-   arrives, so evaluating them at load time always yielded the defaults. */
-function getDeliveryRadiusKm() {
-  const v = Number(getSetting("delivery_radius_km"));
-  return (isFinite(v) && v > 0) ? v : 5;
-}
+const DELIVERY_RADIUS_KM = Number(getSetting("delivery_radius_km")) || 5;
 const BRANCH_SHEET_URL = 'https://opensheet.elk.sh/1grir_i5EwEXcSqES2Ay2IfF0BomtZ12vp-_8ngRMa7E/Sheet1';
-function getCsWhatsapp() {
-  return String(getSetting("customer_service_whatsapp") ||
-                getSetting("whatsapp_number") ||
-                getSetting("contact_whatsapp") || "").trim();
-}
-window.getCsWhatsapp = getCsWhatsapp;
+const CS_WHATSAPP = getSetting("customer_service_whatsapp");
 
 /* ── Cart State ── */
 const CART = new Map(); // id → { id, name_ar, name_en, code, price, old_price, cat, qty }
@@ -6609,13 +6223,9 @@ const CART = new Map(); // id → { id, name_ar, name_en, code, price, old_price
 let _BRANCHES_LOADED = false;
 let _BRANCHES = [];
 let _BRANCHES_LOADING = false;
-let _CTA_HTML = '';
 
 /* ── Cart operations ── */
 function cartAdd(id, productData) {
-  /* First cart interaction is the earliest reliable signal the customer
-     may checkout — start loading branches now (idle-safe, non-blocking). */
-  try { ensureBranchesLoaded(); } catch (e) {}
   if (CART.has(id)) {
     CART.get(id).qty += 1;
   } else {
@@ -6723,46 +6333,24 @@ function _formatDist(km) {
   return km < 1 ? `${Math.round(km*1000)} م` : `${km.toFixed(1)} كم`;
 }
 
-let _BRANCHES_PROMISE = null;
-
-/* Branches load lazily via the unified fetch engine (timeout + retry).
-   Never blocks the storefront and never leaves the CTA stuck. */
-function ensureBranchesLoaded() {
-  if (_BRANCHES_LOADED) return Promise.resolve(true);
-  if (_BRANCHES_PROMISE) return _BRANCHES_PROMISE;   // single-flight, no polling loop
-
+async function ensureBranchesLoaded() {
+  if (_BRANCHES_LOADED) return;
+  if (_BRANCHES_LOADING) {
+    // wait until done
+    return new Promise(res => { const t = setInterval(() => { if (!_BRANCHES_LOADING) { clearInterval(t); res(); } }, 100); });
+  }
   _BRANCHES_LOADING = true;
-  _BRANCHES_PROMISE = fetchJSON(BRANCH_SHEET_URL, { label: "Branches", timeout: 9000, retries: 2 })
-    .then(function (data) {
-      if (!Array.isArray(data) || !data.length) throw new Error("empty branches sheet");
-      _BRANCHES = data.map((r, i) => _normalizeBranchRow(r, i));
-      _BRANCHES_LOADED = true;
-      console.log("[SmartCart] branches loaded:", _BRANCHES.length);
-      return true;
-    })
-    .catch(function (e) {
-      console.warn('[SmartCart] Branch sheet fetch failed:', e.message);
-      if (!_BRANCHES_LOADED) _BRANCHES = [];       // keep any earlier good copy
-      _BRANCHES_PROMISE = null;                    // allow a later retry
-      return false;
-    })
-    .then(function (ok) { _BRANCHES_LOADING = false; return ok; });
-
-  return _BRANCHES_PROMISE;
+  try {
+    const result = await oceanLoadDataset("branches", BRANCH_SHEET_URL);
+    const data = result.data;
+    _BRANCHES = data.map((r, i) => _normalizeBranchRow(r, i));
+    _BRANCHES_LOADED = true;
+  } catch(e) {
+    console.warn('[SmartCart] Branch sheet fetch failed:', e.message);
+    _BRANCHES = [];
+  }
+  _BRANCHES_LOADING = false;
 }
-
-/* Idle prefetch — skipped entirely on 2g/slow-2g/Save-Data networks. */
-let _idleBranchScheduled = false;
-function scheduleIdleBranchPrefetch() {
-  if (_idleBranchScheduled || _BRANCHES_LOADED) return;
-  if (isSlowNetwork()) { console.log("[SmartCart] slow network — deferring branches to checkout"); return; }
-  _idleBranchScheduled = true;
-  const go = function () { if (!isSlowNetwork()) ensureBranchesLoaded(); };
-  if (typeof requestIdleCallback === "function") requestIdleCallback(go, { timeout: 6000 });
-  else setTimeout(go, 3000);
-}
-window.scheduleIdleBranchPrefetch = scheduleIdleBranchPrefetch;
-window.ensureBranchesLoaded = ensureBranchesLoaded;
 
 function computeBranchDistances(lat, lng) {
   return _BRANCHES.map(b => ({
@@ -6781,7 +6369,7 @@ function getNearestDeliveryBranch(branchesWithDist) {
 /* ── WhatsApp URL builder ── */
 function normalizeWhatsappPhone(rawWhatsapp) {
   let raw = String(rawWhatsapp || '').trim();
-  if (!raw) raw = getCsWhatsapp();
+  if (!raw) raw = String(CS_WHATSAPP || getSetting('whatsapp_number') || getSetting('contact_whatsapp') || '').trim();
 
   // Accept normal numbers or full WhatsApp links from Google Sheet / Settings
   let phone = '';
@@ -6864,20 +6452,6 @@ function openWhatsAppOrder(branch, location) {
   openWhatsappUrl(url);
 }
 
-/* ── Fallback route: order via customer service, no branch required ──
-   Used when the Branches sheet is unreachable so the customer is never
-   blocked from completing a WhatsApp order. */
-function openCustomerServiceOrder(location) {
-  const msg = buildCartMessage({ location: location || null, noLocation: !location }) +
-              '\n\nملاحظة: تعذر تحديد أقرب فرع تلقائياً، فضلاً توجيه الطلب للفرع المناسب.';
-  const cs = getCsWhatsapp();
-  const url = buildWhatsappUrl(cs, msg);
-  if (!url) { showOrderToast('تعذر فتح واتساب — فضلاً حاول مرة أخرى'); return false; }
-  openWhatsappUrl(url);
-  return true;
-}
-window.openCustomerServiceOrder = openCustomerServiceOrder;
-
 /* ── Toast ── */
 function showOrderToast(text, duration) {
   const t = document.getElementById('order-toast');
@@ -6928,7 +6502,7 @@ function buildPickupMessage({ location, branch }) {
 
 function openWhatsAppPickupOrder(branch, location) {
   const msg = buildPickupMessage({ location, branch });
-  const url = buildWhatsappUrl(branch && branch.whatsapp ? branch.whatsapp : getCsWhatsapp(), msg);
+  const url = buildWhatsappUrl(branch && branch.whatsapp ? branch.whatsapp : CS_WHATSAPP, msg);
   openWhatsappUrl(url);
 }
 
@@ -6991,7 +6565,7 @@ function showOutOfCoverageModal(branchOrMsg, location, pickupBranch) {
   if (supportBtn) {
     supportBtn.addEventListener('click', () => {
       const msg = buildCartMessage({ location, branch: pickup, outsideCoverage: true });
-      openWhatsappUrl(buildWhatsappUrl(getCsWhatsapp(), msg));
+      openWhatsappUrl(buildWhatsappUrl(CS_WHATSAPP, msg));
       closeOrderModal();
     });
   }
@@ -7029,7 +6603,7 @@ function showLocationDeniedModal() {
     </div>`;
   document.getElementById('ld-no-loc-btn').addEventListener('click', () => {
     const msg = buildCartMessage({ noLocation: true });
-    openWhatsappUrl(buildWhatsappUrl(getCsWhatsapp(), msg));
+    openWhatsappUrl(buildWhatsappUrl(CS_WHATSAPP, msg));
     closeOrderModal();
   });
   document.getElementById('ld-retry-btn').addEventListener('click', () => {
@@ -7051,24 +6625,10 @@ async function handleOrderClick() {
 
   // Show loading state on button
   const btn = document.getElementById('smart-cart-cta');
-  const _resetCta = function () {
-    if (!btn) return;
-    btn.classList.remove('loading');
-    btn.innerHTML = _CTA_HTML;
-  };
-  if (btn) { if (!_CTA_HTML) _CTA_HTML = btn.innerHTML; btn.classList.add('loading'); btn.textContent = 'جارٍ تحديد موقعك…'; }
+  if (btn) { btn.classList.add('loading'); btn.textContent = 'جارٍ تحديد موقعك…'; }
 
-  // Ensure branch data loaded (lazy; timeout + retry inside)
-  const branchesOk = await ensureBranchesLoaded();
-
-  /* Branch data unavailable → never leave the CTA spinning, and always
-     offer the customer-service WhatsApp route so the order can still be sent. */
-  if (!branchesOk || !_BRANCHES.length) {
-    _resetCta();
-    showOrderToast('تعذر تحديد الفروع حاليًا — سنحوّلك لخدمة العملاء');
-    openCustomerServiceOrder();
-    return;
-  }
+  // Ensure branch data loaded (lazy, background)
+  await ensureBranchesLoaded();
 
   if (!navigator.geolocation) {
     if (btn) { btn.classList.remove('loading'); btn.innerHTML = '<svg class="wa-ic" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> اطلب من أقرب فرع إليك'; }
@@ -7096,7 +6656,7 @@ async function handleOrderClick() {
         return;
       }
 
-      if (nearest && nearest.dist <= getDeliveryRadiusKm()) {
+      if (nearest && nearest.dist <= DELIVERY_RADIUS_KM) {
         // ✅ Within delivery radius → open WhatsApp delivery order
         openWhatsAppOrder(nearest, location);
       } else {
@@ -7134,15 +6694,14 @@ document.addEventListener('click', function(e) {
 });
 
 /* ── Cart bar CTA wiring ── */
-function _wireCartCta() {
+document.addEventListener('DOMContentLoaded', function() {
+  const btn = document.getElementById('smart-cart-cta');
+  if (btn) btn.addEventListener('click', handleOrderClick);
+});
+if (document.readyState !== 'loading') {
   const btn = document.getElementById('smart-cart-cta');
   if (btn && !btn._cartWired) { btn._cartWired = true; btn.addEventListener('click', handleOrderClick); }
 }
-/* Branches are NOT prefetched on a timer any more. They load on the first of:
-   first cart add · cart sheet open · checkout click · idle after products
-   (idle path is skipped on 2g / slow-2g / Save-Data). */
-document.addEventListener('DOMContentLoaded', _wireCartCta);
-if (document.readyState !== 'loading') _wireCartCta();
 
 /* END SMART CART */
 
@@ -7264,19 +6823,16 @@ function buildFinalPageSettings() {
   return merged;
 }
 
-/* Products no longer wait on Magazine_Settings — loadMagazine() fetches
-   Products, Categories and Settings in parallel via Promise.allSettled. */
-var _booted = false;
 function boot() {
-  if (_booted) return;
-  _booted = true;
-  ensureNetBar();
-  Promise.resolve(loadMagazine()).catch(function (e) {
-    console.warn("[boot] loadMagazine failed:", e && e.message);
-  });
+  loadMagazine();
 }
 document.addEventListener("DOMContentLoaded", boot);
 if (document.readyState !== "loading") boot();
+window.addEventListener("offline", function () { oceanSetConnectionState("offline"); });
+window.addEventListener("online", function () {
+  oceanSetConnectionState("loading", "عاد الاتصال — جاري تحديث العروض…");
+  loadMagazine({ force: true });
+});
 </script>
 
 <script>
@@ -7531,11 +7087,7 @@ function renderErrorStatePremium(msg, partial) {
 window.retryLoad = function(btn) {
   if (btn) { btn.classList.add("loading"); btn.textContent = "جاري التحميل…"; }
   _imgPriorityIdx = 0; /* reset priority counter */
-  if (typeof resetImagePriority === "function") resetImagePriority();
-  if (typeof loadMagazine !== "function") return;
-  Promise.resolve(loadMagazine({ force: true })).catch(function () {}).then(function () {
-    if (btn) { btn.classList.remove("loading"); btn.textContent = "إعادة المحاولة"; }
-  });
+  if (typeof loadMagazine === "function") loadMagazine();
 };
 
 /* ══════════════════════════════════════════════════════════════
@@ -9082,39 +8634,18 @@ function activeFilterCount() {
 
 /* ─────────────────────────── RENDERING ───────────────────────── */
 function fmtPrice(n) { return (Math.round(n * 100) / 100).toFixed(2); }
-/* Priority budget: only the first few above-the-fold images are eager.
-   Everything else (including the whole discovery rail) stays lazy so it
-   never competes with the main grid on a weak connection. */
-var EAGER_BUDGET = 6;
-var _eagerUsed = 0;
-var _seenImgUrls = new Set();   /* prevents re-requesting the same image in discovery + grid */
-function resetImagePriority() { _eagerUsed = 0; _seenImgUrls.clear(); }
-
-function shopImgHtml(p, opts) {
+var _shopImageRenderIndex = 0;
+function shopImgHtml(p) {
   var url = imageUrlFor(p);
   if (!url) return PH_HTML;
-  var forceLazy = !!(opts && opts.lazy);
   var id = extractDriveId(url);
   var fb = id ? "https://lh3.googleusercontent.com/d/" + id : "";
   var safePh = PH_HTML.replace(/'/g, "\\'").replace(/"/g, "&quot;");
   var onerr = fb
     ? "if(!this._f){this._f=1;this.src='" + fb + "';}else{this.outerHTML='" + safePh + "';}"
     : "this.outerHTML='" + safePh + "';";
-
-  /* Same URL already emitted this render → always lazy; the HTTP cache
-     serves the second instance without a second network request. */
-  var repeat = _seenImgUrls.has(url);
-  if (!repeat) _seenImgUrls.add(url);
-
-  var eager = !forceLazy && !repeat && !isSlowNetwork() && _eagerUsed < EAGER_BUDGET;
-  if (eager) _eagerUsed++;
-
-  var prio = eager
-    ? ' loading="eager" fetchpriority="high"'
-    : ' loading="lazy" fetchpriority="low"';
-
-  return '<img src="' + escapeHtml(url) + '" alt="' + escapeHtml(p.product_name_ar || "") + '"' +
-         prio + ' decoding="async" onerror="' + onerr + '">';
+  var priority = _shopImageRenderIndex++ < 6;
+  return '<img src="' + escapeHtml(url) + '" alt="' + escapeHtml(p.product_name_ar || "") + '" loading="' + (priority ? 'eager' : 'lazy') + '" decoding="async"' + (priority ? ' fetchpriority="high"' : '') + ' onerror="' + onerr + '">';
 }
 function shopBadgeHtml(e) {
   var p = e.p, d = String(p.discount_percent || "").trim();
@@ -9168,6 +8699,7 @@ function renderShopResults(options) {
   var empty = document.getElementById("shop-empty");
   var countEl = document.getElementById("shop-result-count");
   if (!grid) return;
+  if (!appendOnly) _shopImageRenderIndex = 0;
 
   var results = currentResults();
   var n = results.length;
@@ -9213,9 +8745,6 @@ function renderShopResults(options) {
     ? grid.querySelectorAll(".shop-card").length
     : 0;
   var canAppend = appendOnly && existing > 0 && existing < shown;
-  /* Fresh full render → reset the eager-image budget. Appends keep the
-     existing budget so newly appended cards stay lazy. */
-  if (!canAppend) resetImagePriority();
   var html = "";
   for (var i = canAppend ? existing : 0; i < shown; i++) html += shopCardHtml(results[i].e);
   if (canAppend) {
@@ -9290,7 +8819,7 @@ function discoveryBadgeHtml(e) {
 }
 function discoveryMiniCard(e) {
   return '<button type="button" class="dv-card" data-shop-id="' + escapeHtml(e.id) + '" aria-label="' + escapeHtml(e.p.product_name_ar || "") + '">' +
-    '<span class="dv-img">' + discoveryBadgeHtml(e) + shopImgHtml(e.p, { lazy: true }) + '</span>' +
+    '<span class="dv-img">' + discoveryBadgeHtml(e) + shopImgHtml(e.p) + '</span>' +
     '<span class="dv-name">' + escapeHtml(e.p.product_name_ar || e.p.product_name_en || "") + '</span>' +
     '<span class="dv-price">' + fmtPrice(e.price) + ' <span>ر.س</span></span>' +
   '</button>';
@@ -9748,16 +9277,11 @@ function wireShopEvents() {
     if (typeof exportMagazinePDF === "function") exportMagazinePDF();
   });
   var mRefresh = document.getElementById("shop-menu-refresh");
-  if (mRefresh && !mRefresh._wired) {
-    mRefresh._wired = true;            /* never bind twice */
-    mRefresh.addEventListener("click", function () {
-      toggleMoreMenu(false);
-      if (typeof setNetStatus === "function") setNetStatus("جارٍ تحديث العروض…", "loading");
-      /* loadMagazine repaints the shop itself via publishProducts —
-         no timer-based second boot, so cards are never rebuilt twice. */
-      if (typeof loadMagazine === "function") Promise.resolve(loadMagazine({ force: true })).catch(function () {});
-    });
-  }
+  if (mRefresh) mRefresh.addEventListener("click", function () {
+    toggleMoreMenu(false);
+    if (typeof loadMagazine === "function") loadMagazine();
+    setTimeout(bootShopFromData, 1500);
+  });
 
   // Mode switching
   var toMag = document.getElementById("shop-to-magazine");
@@ -9974,8 +9498,6 @@ function renderCartSheetBody() {
   });
 }
 function openCartSheet() {
-  /* Opening the cart is a strong checkout signal — ensure branch data. */
-  try { if (typeof ensureBranchesLoaded === "function") ensureBranchesLoaded(); } catch (e) {}
   ensureCartSheet();
   _cartSheetOpen = true;
   renderCartSheetBody();
@@ -10112,23 +9634,15 @@ function bootShopFromData() {
   syncShopCartUI();
   _shopBooted = true;
 }
-/* loadMagazine() calls bootShopFromData() directly via publishProducts().
-   This poll is only a safety net for the case where products land before
-   the shop script initialises; it is bounded and never loops forever. */
 function waitForDataAndBoot() {
-  if (_shopBooted) return;
   var tries = 0;
   (function poll() {
-    if (_shopBooted) return;
     if (window.ALL_PRODUCTS && window.ALL_PRODUCTS.length) { bootShopFromData(); return; }
-    if (++tries > 40) { console.log("[shop] no product data yet — waiting for loadMagazine"); return; }
+    if (++tries > 200) return;
     setTimeout(poll, 250);
   })();
 }
-var _shopWired = false;
 function initShopMode() {
-  if (_shopWired) return;          /* idempotent — no duplicate listeners */
-  _shopWired = true;
   restoreShopState();
   wireShopEvents();
   ensureBackToTop();
