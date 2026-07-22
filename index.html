@@ -4479,6 +4479,36 @@ body:not(.shop-mode) #shop-view { display: none !important; }
   background: #E63946; border-color: #E63946;
 }
 
+/* Backend-driven category identity. Each chip receives its category palette
+   as CSS variables from Categories (accent_color / accent_deep /
+   background_color). Inactive chips stay calm; the selected one becomes
+   fully coloured. */
+.shop-main > .sh-row-chips .sh-chip[data-chip="cat"] {
+  border-color: var(--cat-accent, #0E3D6E);
+  background: var(--cat-bg, #FDFAF1);
+  color: var(--cat-deep, #0A2A4D);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--cat-accent, #0E3D6E) 14%, transparent);
+}
+.shop-main > .sh-row-chips .sh-chip[data-chip="cat"]::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  flex: 0 0 8px;
+  border-radius: 50%;
+  background: var(--cat-accent, #0E3D6E);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--cat-accent, #0E3D6E) 14%, transparent);
+}
+.shop-main > .sh-row-chips .sh-chip[data-chip="cat"].is-active {
+  border-color: var(--cat-accent, #0E3D6E);
+  background: linear-gradient(135deg, var(--cat-accent, #0E3D6E), var(--cat-deep, #0A2A4D));
+  color: var(--cat-on, #fff);
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--cat-accent, #0E3D6E) 34%, transparent);
+}
+.shop-main > .sh-row-chips .sh-chip[data-chip="cat"].is-active::before {
+  background: currentColor;
+  box-shadow: 0 0 0 3px color-mix(in srgb, currentColor 18%, transparent);
+}
+
 @media (max-width: 700px) {
   .shop-header { padding: 5px 8px; }
   .sh-row-primary { gap: 5px; padding: 0; }
@@ -4498,6 +4528,62 @@ body:not(.shop-mode) #shop-view { display: none !important; }
 
 @media (max-width: 380px) {
   body.shop-mode .ocean-logo--header { display: none; }
+}
+
+/* Floating cart: kept out of the header so search and filters get the full
+   horizontal space. The existing button/id are reused to preserve the cart
+   sheet, badge updates and accessibility behaviour. */
+.floating-cart-btn {
+  position: fixed;
+  bottom: max(18px, calc(12px + env(safe-area-inset-bottom, 0px)));
+  inset-inline-start: 16px;
+  z-index: 1120;
+  width: 54px;
+  min-width: 54px;
+  height: 54px;
+  min-height: 54px;
+  padding: 0;
+  border: 1px solid rgba(255,255,255,.28);
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0E3D6E 0%, #0A2A4D 100%);
+  color: #fff;
+  box-shadow: 0 10px 26px rgba(10,42,77,.36);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: bottom .25s ease, transform .15s ease, box-shadow .2s ease;
+}
+.floating-cart-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(10,42,77,.42);
+}
+.floating-cart-btn:active { transform: scale(.94); }
+.floating-cart-btn:focus-visible {
+  outline: 3px solid rgba(43,168,74,.55);
+  outline-offset: 3px;
+}
+.floating-cart-btn .sh-cart-count {
+  top: -3px;
+  inset-inline-start: -3px;
+  box-shadow: 0 0 0 3px #f4f6f9;
+}
+body.cart-bar-open .floating-cart-btn { bottom: 88px; }
+body:not(.shop-mode) .floating-cart-btn { display: none !important; }
+
+@media (max-width: 700px) {
+  .floating-cart-btn {
+    inset-inline-start: 10px;
+    width: 48px;
+    min-width: 48px;
+    height: 48px;
+    min-height: 48px;
+  }
+  body.cart-bar-open .floating-cart-btn {
+    bottom: calc(58px + env(safe-area-inset-bottom, 0px));
+  }
 }
 
 /* ── Main ── */
@@ -5173,7 +5259,6 @@ html.boot-shop #shop-view[hidden] { display: block !important; }
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/><circle cx="9" cy="7" r="2" fill="currentColor" stroke="none"/><circle cx="15" cy="12" r="2" fill="currentColor" stroke="none"/><circle cx="7" cy="17" r="2" fill="currentColor" stroke="none"/></svg><span class="sh-filter-lbl">فلترة</span><span class="sh-filter-count" id="shop-filter-count" hidden></span>
       </button>
       <div class="sh-actions">
-        <button type="button" class="sh-btn sh-cart-btn" id="shop-cart-btn" aria-label="السلة"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="20" r="1.6"/><circle cx="17" cy="20" r="1.6"/><path d="M3 4h2l2.4 11.2a1.6 1.6 0 0 0 1.6 1.3h7.6a1.6 1.6 0 0 0 1.6-1.3L20 8H6"/></svg><span class="sh-cart-count" id="shop-cart-count" hidden>0</span></button>
         <div class="sh-more-wrap">
           <button type="button" class="sh-btn" id="shop-more-btn" aria-haspopup="true" aria-expanded="false" aria-label="المزيد من الخيارات"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="1.9"/><circle cx="12" cy="12" r="1.9"/><circle cx="12" cy="19" r="1.9"/></svg></button>
           <div class="sh-more-menu" id="shop-more-menu" hidden>
@@ -5184,6 +5269,11 @@ html.boot-shop #shop-view[hidden] { display: block !important; }
     </div>
     <div class="sh-suggest" id="shop-suggest" hidden role="listbox" aria-label="اقتراحات البحث"></div>
   </header>
+
+  <button type="button" class="floating-cart-btn sh-cart-btn" id="shop-cart-btn" aria-label="فتح سلة المشتريات">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="20" r="1.6"/><circle cx="17" cy="20" r="1.6"/><path d="M3 4h2l2.4 11.2a1.6 1.6 0 0 0 1.6 1.3h7.6a1.6 1.6 0 0 0 1.6-1.3L20 8H6"/></svg>
+    <span class="sh-cart-count" id="shop-cart-count" hidden>0</span>
+  </button>
 
   <main class="shop-main">
     <div class="sh-row sh-row-chips">
@@ -9124,13 +9214,34 @@ function updateShopFilterBadge() {
 }
 
 /* ───────────────────── HEADER: CHIPS + INTRO ─────────────────── */
+function shopSafeHex(value, fallback) {
+  var v = String(value || "").trim();
+  var m = v.match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i);
+  if (!m) return fallback;
+  if (m[1].length === 3) {
+    v = "#" + m[1].split("").map(function (c) { return c + c; }).join("");
+  }
+  return v.toUpperCase();
+}
+function shopContrastText(hex) {
+  var v = shopSafeHex(hex, "#0E3D6E").slice(1);
+  var r = parseInt(v.slice(0, 2), 16);
+  var g = parseInt(v.slice(2, 4), 16);
+  var b = parseInt(v.slice(4, 6), 16);
+  /* Perceived brightness keeps pale/yellow backend colours readable. */
+  return ((r * 299 + g * 587 + b * 114) / 1000) > 168 ? "#10233D" : "#FFFFFF";
+}
 function renderShopChips() {
   var wrap = document.getElementById("shop-chips");
   if (!wrap) return;
   var html = '<button type="button" class="sh-chip" data-chip="all">الكل</button>' +
              '<button type="button" class="sh-chip chip-hot" data-chip="hot">أقوى الخصومات</button>';
   (window.ORDERED_CATS || []).forEach(function (cat) {
-    html += '<button type="button" class="sh-chip" data-chip="cat" data-cat="' + escapeHtml(cat.key) + '">' + escapeHtml(cat.name_ar) + '</button>';
+    var accent = shopSafeHex(cat.accent, "#0E3D6E");
+    var deep = shopSafeHex(cat.accent_deep, accent);
+    var bg = shopSafeHex(cat.bg, "#FDFAF1");
+    var on = shopContrastText(accent);
+    html += '<button type="button" class="sh-chip" data-chip="cat" data-cat="' + escapeHtml(cat.key) + '" style="--cat-accent:' + accent + ';--cat-deep:' + deep + ';--cat-bg:' + bg + ';--cat-on:' + on + '">' + escapeHtml(cat.name_ar) + '</button>';
   });
   wrap.innerHTML = html;
   syncChipsUI();
