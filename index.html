@@ -4767,8 +4767,45 @@ body.cart-bar-open .mode-pill { bottom: 86px; }
 
 /* Desktop refinements */
 @media (min-width: 701px) {
-  .shop-header { padding-inline: max(24px, calc((100vw - 1240px)/2 + 14px)); }
+  .shop-header {
+    position: sticky;
+    top: 0;
+    z-index: 900;
+    padding-inline: max(24px, calc((100vw - 1240px)/2 + 14px));
+  }
   .sh-search { height: 50px; }
+  .sh-row-primary .sh-brand {
+    flex: 0 0 44px;
+    width: 44px;
+    min-width: 44px;
+  }
+  body.shop-mode .ocean-logo--header {
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
+    padding: 3px;
+    border-radius: 8px;
+  }
+  body.shop-mode .ocean-logo--header .ocean-logo__image {
+    width: 100%;
+    height: 38px;
+  }
+  body.shop-mode .ocean-logo--header .ocean-logo__fallback {
+    max-width: 38px;
+    overflow: hidden;
+    font-size: 10px;
+  }
+  .shop-main > .sh-row-chips {
+    position: sticky;
+    top: 70px;
+    z-index: 860;
+    padding: 8px 0;
+    margin: -4px 0 10px;
+    background: rgba(244,246,249,.96);
+    border-bottom: 1px solid rgba(14,61,110,.08);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
 }
 
 /* Shopping chrome never leaks into print or PDF */
@@ -5071,8 +5108,33 @@ body:not(.shop-mode) #back-to-top { display: none; }
     min-height: 36px !important;
     gap: 4px !important;
   }
-  .sh-row-primary .sh-brand,
+  .sh-row-primary .sh-brand {
+    display: flex !important;
+    flex: 0 0 34px !important;
+    width: 34px !important;
+    min-width: 34px !important;
+  }
   .sh-row-primary .sh-more-wrap { display: none !important; }
+  body.shop-mode .ocean-logo--header {
+    display: inline-flex !important;
+    width: 34px !important;
+    min-width: 34px !important;
+    height: 36px !important;
+    padding: 2px !important;
+    border-radius: 7px !important;
+  }
+  body.shop-mode .ocean-logo--header .ocean-logo__image {
+    width: 100% !important;
+    height: 30px !important;
+  }
+  body.shop-mode .ocean-logo--header .ocean-logo__fallback {
+    font-size: 0 !important;
+  }
+  body.shop-mode .ocean-logo--header .ocean-logo__fallback::after {
+    content: "O";
+    font-size: 19px;
+    font-weight: 900;
+  }
   .sh-row-primary .sh-search,
   .sh-row-primary .sh-filter-btn,
   .sh-row-primary .sh-btn {
@@ -5116,13 +5178,14 @@ body:not(.shop-mode) #back-to-top { display: none; }
 }
 
 /* MAXIMUM PRODUCT VIEW — mobile.
-   The header participates in normal flow (no viewport obstruction while
-   browsing) and the checkout becomes a small floating pill. */
+   Keep the compact search header visible while browsing; the checkout stays
+   a small floating pill so products retain most of the viewport. */
 @media (max-width: 700px) {
   .shop-header {
-    position: relative !important;
-    top: auto !important;
-    box-shadow: 0 3px 10px rgba(10,42,77,.16) !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 900 !important;
+    box-shadow: 0 4px 12px rgba(10,42,77,.22) !important;
   }
   .smart-cart-bar {
     justify-content: center !important;
@@ -5164,7 +5227,7 @@ body:not(.shop-mode) #back-to-top { display: none; }
   .shop-main > .sh-row-chips {
     display: flex !important;
     position: sticky !important;
-    top: 0 !important;
+    top: 42px !important;
     z-index: 860 !important;
     padding: 5px 0 !important;
     margin: -5px 0 7px !important;
@@ -5186,6 +5249,42 @@ body:not(.shop-mode) #back-to-top { display: none; }
     font-size: 11.5px !important;
     border-width: 1px !important;
     box-shadow: none !important;
+  }
+}
+
+/* RELIABLE PINNED CATEGORY DOCK
+   Fixed positioning avoids browser-specific sticky failures caused by the
+   storefront's nested width/overflow layers. Matching top padding keeps the
+   first content row fully visible beneath the dock. */
+@media (min-width: 701px) {
+  .shop-main { padding-top: 70px; }
+  .shop-main > .sh-row-chips {
+    position: fixed !important;
+    top: 70px !important;
+    inset-inline: 0 !important;
+    width: auto !important;
+    box-sizing: border-box;
+    z-index: 880 !important;
+    margin: 0 !important;
+    padding: 8px max(24px, calc((100vw - 1240px)/2 + 14px)) !important;
+    background: rgba(244,246,249,.97) !important;
+    box-shadow: 0 4px 12px rgba(10,42,77,.10) !important;
+  }
+}
+
+@media (max-width: 700px) {
+  .shop-main { padding-top: 56px !important; }
+  .shop-main > .sh-row-chips {
+    position: fixed !important;
+    top: 42px !important;
+    inset-inline: 0 !important;
+    width: auto !important;
+    box-sizing: border-box;
+    z-index: 880 !important;
+    margin: 0 !important;
+    padding: 5px 8px !important;
+    background: rgba(244,246,249,.97) !important;
+    box-shadow: 0 3px 10px rgba(10,42,77,.10) !important;
   }
 }
 
